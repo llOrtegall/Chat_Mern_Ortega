@@ -9,10 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sanity/client": "5.4.2",
+    "@sanity/image-url": "1.0.2",
+    "@stripe/stripe-js": "1.52.1",
+    "canvas-confetti": "1.5.1",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.1",
     "next": "13.3.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-hot-toast": "2.4.1",
+    "react-icons": "4.8.0",
+    "stripe": "12.3.0"
+
   }
 }
