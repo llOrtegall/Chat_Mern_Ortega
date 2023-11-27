@@ -1,12 +1,21 @@
-import { useState } from 'react'
+import axios from 'axios'
+import { useContext, useState } from 'react'
+import { UserContext } from '../UserContext'
 
 export function Register () {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const { setUser } = useContext(UserContext)
+
+  async function handleSubmit (ev) {
+    ev.preventDefault()
+    const { data } = await axios.post('/register', { username, password })
+    setUser(data)
+  }
 
   return (
     <section className="bg-blue-200 h-screen flex items-center">
-      <form className="w-64 mx-auto mb-12">
+      <form className="w-64 mx-auto mb-12" onSubmit={handleSubmit}>
         <input value={username}
           onChange={ev => setUsername(ev.target.value)}
           placeholder="Username" type="text"
