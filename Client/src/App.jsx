@@ -1,10 +1,9 @@
-function App() {
+import { Register } from './Components/Register'
 
+export function App () {
   return (
-    <>
-      <h1>App</h1>  
-    </>
+    <main>
+      <Register />
+    </main>
   )
 }
-
-export default App
