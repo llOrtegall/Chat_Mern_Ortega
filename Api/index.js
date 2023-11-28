@@ -87,7 +87,15 @@ const server = app.listen(PORT, () => {
 
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (connection) => {
-  console.log('connected');
-  
+wss.on('connection', (connection, req) => {
+  const cookies = req.headers.cookie;
+  if(cookies){
+    const tokenCokieString = cookies.split(';').find(str => str.startsWith('token='));
+    if(tokenCokieString){
+      const token = tokenCokieString.split('=')[1];
+      if(token){
+
+      }
+    }
+  }
 });
