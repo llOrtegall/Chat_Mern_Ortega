@@ -1,5 +1,6 @@
 import { UserModel } from './models/User.js';
 import cookieParser from 'cookie-parser';
+import { WebSocketServer } from 'ws'
 import mongoose from 'mongoose';
 import bycrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -32,7 +33,6 @@ app.get('/test', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body
-  console.log(req.body);
   
   const foundUser = await UserModel.findOne({username})
   if(foundUser){
@@ -45,9 +45,7 @@ app.post('/login', async (req, res) => {
         })
       })
     }
-  }
-
-  
+  }  
 });
 
 app.get('/profile', async (req, res) => {
@@ -62,10 +60,8 @@ app.get('/profile', async (req, res) => {
   }
 });
  
-
 app.post('/register', async(req, res) => {
   const { username, password } = req.body;
-
   try {
     const hashedPassword = bycrypt.hashSync(password, bcryptSalt)
     const createdUser = await UserModel.create({ 
@@ -83,9 +79,15 @@ app.post('/register', async(req, res) => {
   } catch (err) {
     res.status(500).json({message: 'Internal server error', error: err})
   }
-  
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+});
+
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (connection) => {
+  console.log('connected');
+  
 });
