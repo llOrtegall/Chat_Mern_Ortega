@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Avatar } from './Avatar'
 
-export function Chat() {
+export function Chat () {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
+  const [selectedContact, setSelectedContact] = useState(null)
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
@@ -11,7 +12,7 @@ export function Chat() {
     ws.addEventListener('message', sendMessage)
   }, [])
 
-  function showOnLinePeople(peopleArray) {
+  function showOnLinePeople (peopleArray) {
     const people = {}
     peopleArray.forEach(({ userId, username }) => {
       people[userId] = username
@@ -19,7 +20,7 @@ export function Chat() {
     setOnlinePeople(people)
   }
 
-  function sendMessage(e) {
+  function sendMessage (e) {
     const messageData = JSON.parse(e.data)
     if ('online' in messageData) {
       showOnLinePeople(messageData.online)
@@ -35,9 +36,9 @@ export function Chat() {
           </svg>
           MernChat</div>
         {Object.keys(onlinePeople).map(userId => (
-          <div key={userId} className='border-b border-gray-100 py-2 flex items-center gap-2'>
+          <div onClick={() => setSelectedContact(userId)} key={userId} className={`border-b border-gray-100 py-2 flex items-center gap-2 cursor-pointer ${userId === selectedContact ? 'bg-blue-200' : ''}`}>
             <Avatar username={onlinePeople[userId]} userId={userId}/>
-            <span>{onlinePeople[userId]}</span>
+            <span className='text-gray-800'>{onlinePeople[userId]}</span>
           </div>
         ))}
       </div>

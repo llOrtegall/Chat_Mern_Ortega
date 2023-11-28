@@ -8,7 +8,7 @@ export function Avatar ({ userId, username }) {
 
   return (
     <div className={`w-8 h-8 rounded-full flex items-center ${color}`}>
-      <div className="text-center w-full uppercase font-semibold">{username[0]}</div>
+      <div className="text-center w-full uppercase font-semibold opacity-75">{username[0]}</div>
     </div>
   )
 }
