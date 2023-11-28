@@ -30,14 +30,19 @@ app.get('/test', (req, res) => {
   res.json({ message: 'Hello World' });
 });
 
-app.get('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body
+  console.log(req.body);
+  
   const foundUser = await UserModel.findOne({username})
   if(foundUser){
     const passOk = bycrypt.compareSync(password, foundUser.password)
     if(passOk){
       jwt.sign({userId: foundUser._id, username}, JWT_SECRET, {}, (err, token) => {
-        
+        if(err) throw err;
+        res.cookie('token', token, {sameSite: 'none', secure: true }).status(200).json({
+          id: foundUser._id
+        })
       })
     }
   }
@@ -72,7 +77,7 @@ app.post('/register', async(req, res) => {
         res.status(500).json({message: 'Internal server error', error: err})
       }
       res.cookie('token', token, {sameSite: 'none', secure: true }).status(201).json({
-        id: createdUser._id, 
+        id: createdUser._id
       })
     })
   } catch (err) {
