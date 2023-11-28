@@ -8,8 +8,15 @@ export function Chat () {
     ws.addEventListener('message', sendMessage)
   }, [])
 
-  function sendMessage (message) {
-    console.log('message', message)
+  function showOnLinePeople (people) {
+    console.log(people)
+  }
+
+  function sendMessage (e) {
+    const messageData = JSON.parse(e.data)
+    if ('online' in messageData) {
+      showOnLinePeople(messageData.online)
+    }
   }
 
   return (

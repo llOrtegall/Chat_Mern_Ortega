@@ -94,8 +94,20 @@ wss.on('connection', (connection, req) => {
     if(tokenCokieString){
       const token = tokenCokieString.split('=')[1];
       if(token){
-
+        jwt.verify(token, JWT_SECRET, {}, (err, userData) => {
+          if(err) throw err;
+          const {userId, username} = userData;
+          connection.userId = userId;
+          connection.username = username;      
+        })
       }
     }
   }
+
+  [...wss.clients].forEach(client => {
+    client.send(JSON.stringify({
+      online: [...wss.clients].map(c => ({userId: c.userId, username: c.username}))
+    }
+    ))
+  });
 });
