@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
+import { uniqBy } from 'lodash'
 import { Avatar } from './Avatar'
 import { Logo } from './Logo'
 import { UserContext } from '../UserContext'
@@ -30,8 +31,8 @@ export function Chat () {
     console.log({ e, messageData })
     if ('online' in messageData) {
       showOnLinePeople(messageData.online)
-    } else {
-      setMessages(prev => ([...prev, { text: messageData.text, isOur: false }]))
+    } else if ('text' in messageData) {
+      setMessages(prev => ([...prev, { ...messageData }]))
     }
   }
 
@@ -42,11 +43,17 @@ export function Chat () {
       text: newMessageText
     }))
     setNewMessageText('')
-    setMessages(prev => ([...prev, { text: newMessageText, isOur: true }]))
+    setMessages(prev => ([...prev, {
+      text: newMessageText,
+      sender: user.userId,
+      recipient: selectedContact
+    }]))
   }
 
   const onlinePeopleExcluOurUser = { ...onlinePeople }
   delete onlinePeopleExcluOurUser[user.userId]
+
+  const messagesWithOutDupes = uniqBy(messages, 'id')
 
   return (
     <section className="flex h-screen">
@@ -72,8 +79,15 @@ export function Chat () {
             </div>
           )}
           {!!selectedContact && (
-            <div>{messages.map(message => (
-              <div>{message.text}</div>
+            <div className='overflow-auto'>{messagesWithOutDupes.map(message => (
+              <div key={message.sender} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
+                <div className={' ' + (message.sender === user.userId ? 'bg-blue-500 text-white p-2 m-2 rounded-md inline-block text-left' : 'bg-white text-gray-500 p-2 m-2 rounded-md inline-block')}>
+                  sender: {message.sender} <br />
+                  my id: {user.userId} <br />
+                  {message.text}
+                </div>
+              </div>
+
             ))}</div>
           )}
         </div>
