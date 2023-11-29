@@ -8,6 +8,7 @@ export function Chat () {
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedContact, setSelectedContact] = useState(null)
   const [newMessageText, setNewMessageText] = useState('')
+  const [messages, setMessages] = useState([])
   const { user } = useContext(UserContext)
 
   useEffect(() => {
@@ -26,19 +27,22 @@ export function Chat () {
 
   function handleMessage (e) {
     const messageData = JSON.parse(e.data)
+    console.log({ e, messageData })
     if ('online' in messageData) {
       showOnLinePeople(messageData.online)
+    } else {
+      setMessages(prev => ([...prev, { text: messageData.text, isOur: false }]))
     }
   }
 
   function sendMessage (ev) {
     ev.preventDefault()
     ws.send(JSON.stringify({
-      message: {
-        recipient: selectedContact,
-        text: newMessageText
-      }
+      recipient: selectedContact,
+      text: newMessageText
     }))
+    setNewMessageText('')
+    setMessages(prev => ([...prev, { text: newMessageText, isOur: true }]))
   }
 
   const onlinePeopleExcluOurUser = { ...onlinePeople }
@@ -66,6 +70,11 @@ export function Chat () {
             <div className='flex h-full items-center justify-center'>
               <div className='text-gray-500'>&larr; Select a contact from the sidebar</div>
             </div>
+          )}
+          {!!selectedContact && (
+            <div>{messages.map(message => (
+              <div>{message.text}</div>
+            ))}</div>
           )}
         </div>
         {!!selectedContact && (

@@ -1,6 +1,7 @@
 import { UserModel } from './models/User.js';
 import cookieParser from 'cookie-parser';
 import { WebSocketServer } from 'ws'
+import { MessageModel } from './models/Message.js';
 import mongoose from 'mongoose';
 import bycrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -87,6 +88,7 @@ const server = app.listen(PORT, () => {
 
 const wss = new WebSocketServer({ server });
 
+// TODO: read username from the cookie for this connection
 wss.on('connection', (connection, req) => {
   const cookies = req.headers.cookie;
   if(cookies){
@@ -102,12 +104,35 @@ wss.on('connection', (connection, req) => {
         })
       }
     }
+
+    connection.on('message', async (message) => {
+      const messageData = JSON.parse(message.toString());
+      const {recipient, text} = messageData;
+      if(recipient && text) {
+        const messageDoc = await MessageModel.create({
+          sender: connection.userId,
+          recipient,
+          text
+        });
+
+        [...wss.clients]
+          .filter(c => c.userId === recipient)
+          .forEach(c => c.send(JSON.stringify(
+            {
+              text, 
+              sender: connection.userId,
+              id: messageDoc._id
+            }
+          )))
+      }
+    })
   }
 
+  // TODO: notify everyone about online people
   [...wss.clients].forEach(client => {
     client.send(JSON.stringify({
       online: [...wss.clients].map(c => ({userId: c.userId, username: c.username}))
     }
     ))
-  });
-});
+  })
+})
