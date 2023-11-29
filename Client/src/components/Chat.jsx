@@ -23,7 +23,10 @@ export function Chat () {
     setWs(ws)
     ws.addEventListener('message', handleMessage)
     ws.addEventListener('close', () => {
-      connectToWs()
+      setTimeout(() => {
+        console.log('Disconected. Trying to reconnect...')
+        connectToWs()
+      }, 1000)
     })
   }
 
@@ -56,7 +59,7 @@ export function Chat () {
       text: newMessageText,
       sender: user.userId,
       recipient: selectedContact,
-      id: Date.now()
+      _id: Date.now()
     }]))
   }
 
@@ -69,7 +72,7 @@ export function Chat () {
   useEffect(() => {
     if (selectedContact) {
       axios.get('/messages/' + selectedContact).then(response => {
-        console.log(response)
+        setMessages(response.data)
       })
     }
   }, [selectedContact])
@@ -77,7 +80,7 @@ export function Chat () {
   const onlinePeopleExcluOurUser = { ...onlinePeople }
   delete onlinePeopleExcluOurUser[user.userId]
 
-  const messagesWithOutDupes = uniqBy(messages, 'id')
+  const messagesWithOutDupes = uniqBy(messages, '_id')
 
   return (
     <section className="flex h-screen">
@@ -107,8 +110,6 @@ export function Chat () {
                 <div className='overflow-y-auto absolute inset-0'>{messagesWithOutDupes.map(message => (
                   <div key={message.sender} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
                     <div className={' ' + (message.sender === user.userId ? 'bg-blue-500 text-white p-2 m-2 rounded-md inline-block text-left' : 'bg-white text-gray-500 p-2 m-2 rounded-md inline-block')}>
-                      sender: {message.sender} <br />
-                      my id: {user.userId} <br />
                       {message.text}
                     </div>
                   </div>
