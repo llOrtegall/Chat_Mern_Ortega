@@ -28,8 +28,33 @@ app.use(cookieParser());
 
 mongoose.connect(MONGO_URL);
 
+async function getUserDataFromRequest(req){
+  return new Promise((resolve, reject) => {
+    const token = req.cookies?.token;
+    if (token){
+      jwt.verify(token, JWT_SECRET, {}, (err, userData) => {
+        if(err) throw err;
+        resolve(userData)
+      })
+    }else{
+      reject({message: 'Unauthorized'})
+    }
+  });
+}
+
 app.get('/test', (req, res) => {
   res.json({ message: 'Hello World' });
+});
+
+app.get('/messages/:userId', async (req, res) => {
+  const {userId} = req.params;
+  const userData = await getUserDataFromRequest(req);
+  const ourUserId = userData.userId;
+  const messages = await MessageModel.find({
+    sender: {$in: [userId, ourUserId]},
+    recipient: {$in: [userId, ourUserId]}
+  }).sort({createdAt: -1}).exec();
+  res.json(messages);
 });
 
 app.post('/login', async (req, res) => {

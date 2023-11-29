@@ -3,8 +3,9 @@ import { uniqBy } from 'lodash'
 import { Avatar } from './Avatar'
 import { Logo } from './Logo'
 import { UserContext } from '../UserContext'
+import axios from 'axios'
 
-export function Chat() {
+export function Chat () {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedContact, setSelectedContact] = useState(null)
@@ -19,7 +20,7 @@ export function Chat() {
     ws.addEventListener('message', handleMessage)
   }, [])
 
-  function showOnLinePeople(peopleArray) {
+  function showOnLinePeople (peopleArray) {
     const people = {}
     peopleArray.forEach(({ userId, username }) => {
       people[userId] = username
@@ -27,7 +28,7 @@ export function Chat() {
     setOnlinePeople(people)
   }
 
-  function handleMessage(e) {
+  function handleMessage (e) {
     const messageData = JSON.parse(e.data)
     console.log({ e, messageData })
     if ('online' in messageData) {
@@ -37,7 +38,7 @@ export function Chat() {
     }
   }
 
-  function sendMessage(ev) {
+  function sendMessage (ev) {
     ev.preventDefault()
     ws.send(JSON.stringify({
       recipient: selectedContact,
@@ -57,6 +58,14 @@ export function Chat() {
     if (!div) return
     div.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [messages])
+
+  useEffect(() => {
+    if (selectedContact) {
+      axios.get('/messages/' + selectedContact).then(response => {
+        console.log(response)
+      })
+    }
+  }, [selectedContact])
 
   const onlinePeopleExcluOurUser = { ...onlinePeople }
   delete onlinePeopleExcluOurUser[user.userId]
