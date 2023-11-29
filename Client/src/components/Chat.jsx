@@ -1,16 +1,17 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { uniqBy } from 'lodash'
 import { Avatar } from './Avatar'
 import { Logo } from './Logo'
 import { UserContext } from '../UserContext'
 
-export function Chat () {
+export function Chat() {
   const [ws, setWs] = useState(null)
   const [onlinePeople, setOnlinePeople] = useState({})
   const [selectedContact, setSelectedContact] = useState(null)
   const [newMessageText, setNewMessageText] = useState('')
   const [messages, setMessages] = useState([])
   const { user } = useContext(UserContext)
+  const divUnderMessages = useRef()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
@@ -18,7 +19,7 @@ export function Chat () {
     ws.addEventListener('message', handleMessage)
   }, [])
 
-  function showOnLinePeople (peopleArray) {
+  function showOnLinePeople(peopleArray) {
     const people = {}
     peopleArray.forEach(({ userId, username }) => {
       people[userId] = username
@@ -26,7 +27,7 @@ export function Chat () {
     setOnlinePeople(people)
   }
 
-  function handleMessage (e) {
+  function handleMessage(e) {
     const messageData = JSON.parse(e.data)
     console.log({ e, messageData })
     if ('online' in messageData) {
@@ -36,7 +37,7 @@ export function Chat () {
     }
   }
 
-  function sendMessage (ev) {
+  function sendMessage(ev) {
     ev.preventDefault()
     ws.send(JSON.stringify({
       recipient: selectedContact,
@@ -46,9 +47,16 @@ export function Chat () {
     setMessages(prev => ([...prev, {
       text: newMessageText,
       sender: user.userId,
-      recipient: selectedContact
+      recipient: selectedContact,
+      id: Date.now()
     }]))
   }
+
+  useEffect(() => {
+    const div = divUnderMessages.current
+    if (!div) return
+    div.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [messages])
 
   const onlinePeopleExcluOurUser = { ...onlinePeople }
   delete onlinePeopleExcluOurUser[user.userId]
@@ -79,16 +87,19 @@ export function Chat () {
             </div>
           )}
           {!!selectedContact && (
-            <div className='overflow-auto'>{messagesWithOutDupes.map(message => (
-              <div key={message.sender} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
-                <div className={' ' + (message.sender === user.userId ? 'bg-blue-500 text-white p-2 m-2 rounded-md inline-block text-left' : 'bg-white text-gray-500 p-2 m-2 rounded-md inline-block')}>
-                  sender: {message.sender} <br />
-                  my id: {user.userId} <br />
-                  {message.text}
+              <div className='relative h-full top-0 right-0 left-0 bottom-2'>
+                <div className='overflow-y-auto absolute inset-0'>{messagesWithOutDupes.map(message => (
+                  <div key={message.sender} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
+                    <div className={' ' + (message.sender === user.userId ? 'bg-blue-500 text-white p-2 m-2 rounded-md inline-block text-left' : 'bg-white text-gray-500 p-2 m-2 rounded-md inline-block')}>
+                      sender: {message.sender} <br />
+                      my id: {user.userId} <br />
+                      {message.text}
+                    </div>
+                  </div>
+                ))}
+                  <div className='h-12' ref={divUnderMessages}></div>
                 </div>
               </div>
-
-            ))}</div>
           )}
         </div>
         {!!selectedContact && (
