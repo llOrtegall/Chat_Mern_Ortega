@@ -39,8 +39,8 @@ async function getUserDataFromRequest(req){
     }else{
       reject({message: 'Unauthorized'})
     }
-  });
-}
+  }); 
+} 
 
 app.get('/test', (req, res) => {
   res.json({ message: 'Hello World' });
@@ -150,7 +150,7 @@ wss.on('connection', (connection, req) => {
               id: messageDoc._id
             }
           )))
-      }
+      } 
     })
   }
 

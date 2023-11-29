@@ -15,10 +15,17 @@ export function Chat () {
   const divUnderMessages = useRef()
 
   useEffect(() => {
+    connectToWs()
+  }, [])
+
+  function connectToWs () {
     const ws = new WebSocket('ws://localhost:4040')
     setWs(ws)
     ws.addEventListener('message', handleMessage)
-  }, [])
+    ws.addEventListener('close', () => {
+      connectToWs()
+    })
+  }
 
   function showOnLinePeople (peopleArray) {
     const people = {}
