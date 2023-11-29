@@ -108,7 +108,7 @@ export function Chat () {
           {!!selectedContact && (
               <div className='relative h-full top-0 right-0 left-0 bottom-2'>
                 <div className='overflow-y-auto absolute inset-0'>{messagesWithOutDupes.map(message => (
-                  <div key={message.sender} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
+                  <div key={message._id} className={(message.sender === user.userId ? 'text-right' : 'text-left')}>
                     <div className={' ' + (message.sender === user.userId ? 'bg-blue-500 text-white p-2 m-2 rounded-md inline-block text-left' : 'bg-white text-gray-500 p-2 m-2 rounded-md inline-block')}>
                       {message.text}
                     </div>
