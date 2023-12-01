@@ -29,6 +29,5 @@ export function Register () {
         </form>
       </section>
     </>
-
   )
 }
