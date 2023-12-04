@@ -20,7 +20,7 @@ export function Chat () {
   }, [])
 
   function connectToWs () {
-    const ws = new WebSocket('ws://localhost:4040')
+    const ws = new WebSocket('ws://localhost:3030')
     setWs(ws)
     ws.addEventListener('message', handleMessage)
     ws.addEventListener('close', () => {
@@ -41,7 +41,6 @@ export function Chat () {
 
   function handleMessage (e) {
     const messageData = JSON.parse(e.data)
-    console.log({ e, messageData })
     if ('online' in messageData) {
       showOnLinePeople(messageData.online)
     } else if ('text' in messageData) {
