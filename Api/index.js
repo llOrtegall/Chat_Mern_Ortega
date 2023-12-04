@@ -1,9 +1,9 @@
 import { userRoutes } from './src/Routes/User.Routes.js'
 import { messRoutes } from './src/Routes/Mess.Routes.js'
-import jwt from 'jsonwebtoken';
 import { WebSocketServer } from 'ws';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -66,6 +66,7 @@ wss.on('connection', (connection, req) => {
 
   // TODO: read username from the cookie for this connection
   const cookies = req.headers.cookie;
+
   if (cookies) {
     const tokenCokieString = cookies.split(';').find(str => str.startsWith('token='));
     if (tokenCokieString) {
