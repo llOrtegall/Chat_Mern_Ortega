@@ -1,11 +1,12 @@
 import LoginAndRegisterForm from '../pages/Register'
 import { useUser } from '../context/UserContext'
+import Chat from '../components/Chat'
 
 function Routes () {
-  const { id, username } = useUser()
+  const { username } = useUser()
 
   if (username) {
-    return 'Welcome ' + username + '!' + 'Your id is: ' + id
+    return <Chat />
   }
 
   return (

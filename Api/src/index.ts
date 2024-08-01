@@ -15,12 +15,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const ORIGIN_URL = process.env.ORIGIN_URL as string;
+const ORIGIN_URL1 = process.env.ORIGIN_URL1 as string;
 const SALT = parseInt(process.env.SALT as string);
 
 app.disable('x-powered-by');
 app.use(cookieParser());
 app.use(cors({
-  origin: ORIGIN_URL,
+  origin: [ORIGIN_URL, ORIGIN_URL1],
   credentials: true
 }));
 app.use(express.json());
