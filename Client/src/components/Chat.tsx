@@ -7,7 +7,12 @@ function Chat () {
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
     setWs(ws)
+    ws.addEventListener('message', handleMessages)
   }, [])
+
+  const handleMessages = (event: MessageEvent) => {
+    console.log('message', event)
+  }
 
   return (
     <div className="flex h-screen">

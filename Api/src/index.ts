@@ -1,11 +1,16 @@
 import cookieParser from 'cookie-parser';
-import mongoose from 'mongoose';
+import mongoose, { connection } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import bcryp from 'bcryptjs';
 import cors from 'cors';
 import 'dotenv/config';
-import ws from 'ws';
+import ws, { WebSocket } from 'ws';
+
+interface ExtendedWebSocket extends WebSocket {
+  userId?: string;
+  username?: string;
+}
 
 mongoose.connect(process.env.MONGO_URL as string)
 
@@ -107,6 +112,28 @@ const server = app.listen(PORT, () => {
 // TODO: Implementar el WebSocketServer para el chat
 const wss = new ws.WebSocketServer({ server });
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
+wss.on('connection', (connection: ExtendedWebSocket, req) => {
+  const cookies = req.headers.cookie;
+
+  if(cookies){
+    const tokenCookieString = cookies.split(';').find((cookie: string) => cookie.includes('token'));
+    if(tokenCookieString){
+      const token = tokenCookieString.split('=')[1];
+      if(token){
+        console.log(token);
+        jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
+          if(err) throw err;
+
+          const { userId, username } = decoded;
+
+          connection.userId = userId;
+          connection.username = username;
+
+        });
+      }
+    }
+  }
+
+  console.log([...wss.clients].length);
+  
 });
