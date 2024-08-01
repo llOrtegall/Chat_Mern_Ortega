@@ -4,7 +4,8 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 import bcryp from 'bcryptjs';
 import cors from 'cors';
-import 'dotenv/config'
+import 'dotenv/config';
+import ws from 'ws';
 
 mongoose.connect(process.env.MONGO_URL as string)
 
@@ -99,6 +100,13 @@ app.post('/register', async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`API listening at http://localhost:${PORT}`);
+});
+
+// TODO: Implementar el WebSocketServer para el chat
+const wss = new ws.WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+  console.log('Client connected');
 });

@@ -1,6 +1,14 @@
+import { useEffect, useState } from 'react'
 import { SendIcon } from './icons/SendIcon'
 
 function Chat () {
+  const [ws, setWs] = useState<WebSocket | null>(null)
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:4040')
+    setWs(ws)
+  }, [])
+
   return (
     <div className="flex h-screen">
       <section className="bg-blue-100 w-1/3">
