@@ -1,7 +1,9 @@
+import { useUser } from '../context/UserContext'
 import { useEffect, useState } from 'react'
 import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
+import { ArrowIconLeft } from './icons/ArrowIconLeft'
 
 interface OnlineUser {
   userId: string;
@@ -12,16 +14,18 @@ interface MessageData {
   online: OnlineUser[];
 }
 
-function Chat () {
+function Chat() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
+
+  const { username } = useUser()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
     setWs(ws)
     ws.addEventListener('message', handleMessages)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleMessages = (event: MessageEvent) => {
@@ -39,6 +43,8 @@ function Chat () {
     setOnlinePeople(Object.values(people))
   }
 
+  const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
+
   return (
     <main className="flex h-screen">
       <header className="bg-blue-100 w-1/3 p-2">
@@ -47,11 +53,14 @@ function Chat () {
           <ul>MernChat</ul>
         </nav>
         {
-          onlinePeople.map(({ userId, username }) => (
+          onlinePeopleWithoutMe.map(({ userId, username }) => (
             <section key={userId} onClick={() => setSelectUserId(userId)}
               className={'p-2 border border-b-2 border-gray-300 flex items-center gap-2 cursor-pointer rounded-md mb-1 ' +
                 (userId === selectUserId ? 'bg-blue-200' : '')}>
-              <Avatar userId={userId} username={username} key={userId}/>
+              {
+                userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
+              }
+              <Avatar userId={userId} username={username} key={userId} />
               <span className='text-gray-800'>{username}</span>
             </section>
           ))
@@ -59,7 +68,14 @@ function Chat () {
       </header>
       <section className="flex flex-col bg-blue-200 w-2/3 p-2">
         <div className='flex-grow'>
-          messages selected person
+          {
+            !selectUserId && (
+              <div className='flex items-center justify-center h-full gap-2'>
+                <ArrowIconLeft />
+                <span className='text-gray-800'>Seleccione un chat para iniciar conversación</span>
+              </div>
+            )
+          }
         </div>
         <form className='flex gap-2'>
           <input type="text" placeholder='type your message here'
