@@ -7,6 +7,10 @@ import cors from 'cors';
 import 'dotenv/config';
 import ws, { WebSocket } from 'ws';
 
+// TODO: Imports models
+import { MessageModel } from './model/Message.model';
+import { UserModel } from './model/User.model';
+
 interface ExtendedWebSocket extends WebSocket {
   userId?: string;
   username?: string;
@@ -19,7 +23,6 @@ interface MessageDataInt {
 
 mongoose.connect(process.env.MONGO_URL as string)
 
-import { UserModel } from './model/User.model';
 
 const app = express();
 
@@ -140,14 +143,22 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
     }
   }
 
-  connection.on('message', (message: string) => {
+  connection.on('message', async (message: string) => {
     const messageData: MessageDataInt = JSON.parse(message)
     const { recipient, text } = messageData;
-    
+
     if (recipient && text) {
+      const newMessageDoc = await MessageModel.create({ sender: connection.userId, recipient, text });
       [...wss.clients]
         .filter((client: ExtendedWebSocket) => client.userId === recipient)
-        .forEach((client: ExtendedWebSocket) => { client.send(JSON.stringify({ text, sender: connection.userId })) })
+        .forEach((client: ExtendedWebSocket) => {
+          client.send(JSON.stringify({
+            text,
+            sender: connection.userId,
+            recipient,
+            id: newMessageDoc._id
+          }));
+        })
     }
   });
 

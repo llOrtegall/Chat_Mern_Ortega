@@ -1,9 +1,10 @@
 import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useUser } from '../context/UserContext'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
+import { uniqBy } from 'lodash'
 
 interface OnlineUser {
   userId: string;
@@ -14,6 +15,7 @@ interface MessageData {
   online: OnlineUser[];
   text?: string[];
   isOur?: boolean;
+  sender?: string;
 }
 
 function Chat () {
@@ -23,7 +25,9 @@ function Chat () {
   const [messages, setMessages] = useState<MessageData[]>([])
   const [newMessageText, setNewMessageText] = useState('')
 
-  const { username } = useUser()
+  const divUnderMessage = useRef<HTMLDivElement>(null)
+
+  const { username, id } = useUser()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
@@ -43,12 +47,11 @@ function Chat () {
   }
 
   const handleMessages = (event: MessageEvent) => {
-    console.log(event.data)
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
       showOnlineUsers(messageData.online)
-    } else {
-      setMessages(prev => [...prev, { isOur: false, text: messageData.text, online: [] }])
+    } else if (messageData.text) {
+      setMessages(prev => ([...prev, { ...messageData }]))
     }
   }
 
@@ -61,10 +64,19 @@ function Chat () {
       }
     ))
     setNewMessageText('')
-    setMessages(pre => ([...pre, { isOur: true, text: [newMessageText], online: [] }]))
+    setMessages(pre => ([...pre, { text: [newMessageText], online: [], sender: id, recipient: selectUserId, id: Date.now() }]))
   }
 
+  useEffect(() => {
+    const div = divUnderMessage.current
+    if (div) {
+      div?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [messages])
+
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
+
+  const messagesWithOutDuplicates = uniqBy(messages, 'id')
 
   return (
     <main className="flex h-screen">
@@ -100,15 +112,24 @@ function Chat () {
           }
           {
             !!selectUserId && (
-              <div className='flex flex-col gap-2 h-full overflow-y-auto'>
-                {
-                  messages.map(({ text, isOur }, index) => (
-                    <div key={index} className={'p-2 rounded-md ' + (isOur ? 'bg-blue-600 text-white self-end' : 'bg-gray-300 text-gray-800 self-start')}>
-                      {text}
-                    </div>
-                  ))
-                }
-              </div>
+                <div className='relative h-full'>
+                  <div className='overflow-y-auto absolute top-0 left-0 right-0 bottom-4'>
+                    {
+                      messagesWithOutDuplicates.map(({ text, sender }, index) => (
+                        <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
+                          <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
+                            (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
+                            sender: {sender} <br />
+                            my id: {id} <br />
+                            {text}
+                          </div>
+                        </div>
+                      ))
+                    }
+                    <div ref={divUnderMessage}></div>
+                  </div>
+                </div>
+
             )
           }
         </div>
