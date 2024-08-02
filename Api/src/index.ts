@@ -84,8 +84,8 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = bcryp.hashSync(password, SALT);
 
-    const newUser = await UserModel.create({ 
-      username: username, 
+    const newUser = await UserModel.create({
+      username: username,
       password: hashedPassword
     });
 
@@ -115,14 +115,14 @@ const wss = new ws.WebSocketServer({ server });
 wss.on('connection', (connection: ExtendedWebSocket, req) => {
   const cookies = req.headers.cookie;
 
-  if(cookies){
+  if (cookies) {
     const tokenCookieString = cookies.split(';').find((cookie: string) => cookie.includes('token'));
-    if(tokenCookieString){
+    if (tokenCookieString) {
       const token = tokenCookieString.split('=')[1];
-      if(token){
+      if (token) {
         console.log(token);
         jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
-          if(err) throw err;
+          if (err) throw err;
 
           const { userId, username } = decoded;
 
@@ -134,6 +134,12 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
     }
   }
 
-  console.log([...wss.clients].length);
+  // console.log([...wss.clients].map((client: ExtendedWebSocket) => client.username));
   
+  [...wss.clients].forEach((client: ExtendedWebSocket) => {
+    client.send(JSON.stringify({
+      online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.username, username: client.username }))
+    }));
+  });
+
 });
