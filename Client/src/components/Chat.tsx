@@ -1,9 +1,9 @@
+import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useUser } from '../context/UserContext'
 import { useEffect, useState } from 'react'
 import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
-import { ArrowIconLeft } from './icons/ArrowIconLeft'
 
 interface OnlineUser {
   userId: string;
@@ -14,10 +14,12 @@ interface MessageData {
   online: OnlineUser[];
 }
 
-function Chat() {
+function Chat () {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<{ text: string, isOur: boolean }[]>([])
+  const [newMessageText, setNewMessageText] = useState('')
 
   const { username } = useUser()
 
@@ -30,7 +32,11 @@ function Chat() {
 
   const handleMessages = (event: MessageEvent) => {
     const messageData: MessageData = JSON.parse(event.data)
-    showOnlineUsers(messageData.online)
+    if (messageData.online) {
+      showOnlineUsers(messageData.online)
+    } else {
+      console.log(messageData)
+    }
   }
 
   const showOnlineUsers = (peopleArray: OnlineUser[]) => {
@@ -41,6 +47,18 @@ function Chat() {
     })
 
     setOnlinePeople(Object.values(people))
+  }
+
+  const sendMessage = (event: React.FormEvent) => {
+    event.preventDefault()
+    ws?.send(JSON.stringify(
+      {
+        recipient: selectUserId,
+        text: newMessageText
+      }
+    ))
+    setNewMessageText('')
+    setMessages([...messages, { text: newMessageText, isOur: true }])
   }
 
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
@@ -66,6 +84,7 @@ function Chat() {
           ))
         }
       </header>
+
       <section className="flex flex-col bg-blue-200 w-2/3 p-2">
         <div className='flex-grow'>
           {
@@ -76,14 +95,34 @@ function Chat() {
               </div>
             )
           }
+          {
+            !!selectUserId && (
+              <div className='flex flex-col gap-2 h-full overflow-y-auto'>
+                {
+                  messages.map(({ text, isOur }, index) => (
+                    <div key={index} className={'p-2 rounded-md ' + (isOur ? 'bg-blue-600 text-white self-end' : 'bg-gray-300 text-gray-800 self-start')}>
+                      {text}
+                    </div>
+                  ))
+                }
+              </div>
+            )
+          }
         </div>
-        <form className='flex gap-2'>
-          <input type="text" placeholder='type your message here'
-            className="bg-white border flex-grow  p-2 rounded-md" />
-          <button className="bg-blue-600 p-2 text-white rounded-md">
-            <SendIcon />
-          </button>
-        </form>
+
+        {
+          !!selectUserId && (
+            <form className='flex gap-2' onSubmit={sendMessage}>
+              <input type="text" placeholder='type your message here'
+                value={newMessageText} onChange={e => setNewMessageText(e.target.value)}
+                className="bg-white border flex-grow  p-2 rounded-md" />
+              <button className="bg-blue-600 p-2 text-white rounded-md">
+                <SendIcon />
+              </button>
+            </form>
+          )
+        }
+
       </section>
     </main>
   )

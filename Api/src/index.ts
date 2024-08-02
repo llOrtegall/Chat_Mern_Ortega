@@ -1,5 +1,5 @@
 import cookieParser from 'cookie-parser';
-import mongoose, { connection } from 'mongoose';
+import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import express from 'express';
 import bcryp from 'bcryptjs';
@@ -10,6 +10,11 @@ import ws, { WebSocket } from 'ws';
 interface ExtendedWebSocket extends WebSocket {
   userId?: string;
   username?: string;
+}
+
+interface MessageDataInt {
+  recipient: string;
+  text: string;
 }
 
 mongoose.connect(process.env.MONGO_URL as string)
@@ -113,14 +118,15 @@ const server = app.listen(PORT, () => {
 const wss = new ws.WebSocketServer({ server });
 
 wss.on('connection', (connection: ExtendedWebSocket, req) => {
-  const cookies = req.headers.cookie;
 
+  // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y username
+  const cookies = req.headers.cookie;
   if (cookies) {
     const tokenCookieString = cookies.split(';').find((cookie: string) => cookie.includes('token'));
     if (tokenCookieString) {
       const token = tokenCookieString.split('=')[1];
       if (token) {
-        console.log(token);
+
         jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
           if (err) throw err;
 
@@ -134,8 +140,18 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
     }
   }
 
-  // console.log([...wss.clients].map((client: ExtendedWebSocket) => client.username));
-  
+  connection.on('message', (message: string) => {
+    const messageData: MessageDataInt = JSON.parse(message)
+    const { recipient, text } = messageData;
+    if (recipient && text) {
+      [...wss.clients]
+        .filter((client: ExtendedWebSocket) => client.userId === recipient)
+        .forEach((client: ExtendedWebSocket) => { client.send(JSON.stringify({ text })) })
+
+    }
+  });
+
+  // TODO: enviar a todos los clientes conectados la lista de usuarios conectados
   [...wss.clients].forEach((client: ExtendedWebSocket) => {
     client.send(JSON.stringify({
       online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, username: client.username }))
