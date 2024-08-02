@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { SendIcon } from './icons/SendIcon'
-import { ChatIcon } from './icons/ChatIcon';
+import { ChatIcon } from './icons/ChatIcon'
+import { Avatar } from './ui/Avatar'
 
 interface OnlineUser {
   userId: string;
@@ -37,8 +38,6 @@ function Chat () {
     setOnlinePeople(Object.values(people))
   }
 
-  console.log(ws)
-
   return (
     <main className="flex h-screen">
       <header className="bg-blue-100 w-1/3 p-2">
@@ -48,9 +47,10 @@ function Chat () {
         </nav>
         {
           onlinePeople.map(({ userId, username }) => (
-            <div key={userId} className="p-2 border-b-2 border-gray-300">
-              {username}
-            </div>
+            <section key={userId} className="p-2 border-b-2 border-gray-300 flex items-center gap-2">
+              <Avatar userId={userId} username={username} key={userId}/>
+              <span>{username}</span>
+            </section>
           ))
         }
       </header>
