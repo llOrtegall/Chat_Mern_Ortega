@@ -143,11 +143,11 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   connection.on('message', (message: string) => {
     const messageData: MessageDataInt = JSON.parse(message)
     const { recipient, text } = messageData;
+    
     if (recipient && text) {
       [...wss.clients]
         .filter((client: ExtendedWebSocket) => client.userId === recipient)
-        .forEach((client: ExtendedWebSocket) => { client.send(JSON.stringify({ text })) })
-
+        .forEach((client: ExtendedWebSocket) => { client.send(JSON.stringify({ text, sender: connection.userId })) })
     }
   });
 

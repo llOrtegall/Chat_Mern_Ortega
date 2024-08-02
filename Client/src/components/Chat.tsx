@@ -12,13 +12,15 @@ interface OnlineUser {
 
 interface MessageData {
   online: OnlineUser[];
+  text?: string[];
+  isOur?: boolean;
 }
 
 function Chat () {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<{ text: string, isOur: boolean }[]>([])
+  const [messages, setMessages] = useState<MessageData[]>([])
   const [newMessageText, setNewMessageText] = useState('')
 
   const { username } = useUser()
@@ -30,15 +32,6 @@ function Chat () {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleMessages = (event: MessageEvent) => {
-    const messageData: MessageData = JSON.parse(event.data)
-    if (messageData.online) {
-      showOnlineUsers(messageData.online)
-    } else {
-      console.log(messageData)
-    }
-  }
-
   const showOnlineUsers = (peopleArray: OnlineUser[]) => {
     const people = {} as Record<string, OnlineUser>
 
@@ -47,6 +40,16 @@ function Chat () {
     })
 
     setOnlinePeople(Object.values(people))
+  }
+
+  const handleMessages = (event: MessageEvent) => {
+    console.log(event.data)
+    const messageData: MessageData = JSON.parse(event.data)
+    if (messageData.online) {
+      showOnlineUsers(messageData.online)
+    } else {
+      setMessages(prev => [...prev, { isOur: false, text: messageData.text, online: [] }])
+    }
   }
 
   const sendMessage = (event: React.FormEvent) => {
@@ -58,7 +61,7 @@ function Chat () {
       }
     ))
     setNewMessageText('')
-    setMessages([...messages, { text: newMessageText, isOur: true }])
+    setMessages(pre => ([...pre, { isOur: true, text: [newMessageText], online: [] }]))
   }
 
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
