@@ -15,6 +15,7 @@ interface MessageData {
 function Chat () {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
+  const [selectUserId, setSelectUserId] = useState<string | null>(null)
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:4040')
@@ -47,9 +48,11 @@ function Chat () {
         </nav>
         {
           onlinePeople.map(({ userId, username }) => (
-            <section key={userId} className="p-2 border-b-2 border-gray-300 flex items-center gap-2">
+            <section key={userId} onClick={() => setSelectUserId(userId)}
+              className={'p-2 border border-b-2 border-gray-300 flex items-center gap-2 cursor-pointer rounded-md mb-1 ' +
+                (userId === selectUserId ? 'bg-blue-200' : '')}>
               <Avatar userId={userId} username={username} key={userId}/>
-              <span>{username}</span>
+              <span className='text-gray-800'>{username}</span>
             </section>
           ))
         }

@@ -3,12 +3,11 @@ export const Avatar = ({ userId, username }: { userId: string, username: string}
 
   const userIdBase10 = parseInt(userId, 13)
   const colorIndex = userIdBase10 % colors.length
-  console.log(colorIndex)
   const color = colors[colorIndex]
 
   return (
     <div className={'w-8 h-8  rounded-full flex items-center ' + color}>
-      <span className='w-full text-center font-semibold'>{username[0].toUpperCase()}</span>
+      <span className='w-full text-center font-semibold opacity-85'>{username[0].toUpperCase()}</span>
     </div>
   )
 }
