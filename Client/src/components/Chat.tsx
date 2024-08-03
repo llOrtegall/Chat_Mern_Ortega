@@ -1,12 +1,12 @@
 import { ArrowIconLeft } from './icons/ArrowIconLeft'
-import { useUser } from '../context/UserContext'
 import { useEffect, useRef, useState } from 'react'
+import { useUser } from '../context/UserContext'
+import { useTheme } from '../context/UseTheme'
 import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
 import axios from 'axios'
-import { useTheme } from '../context/UseTheme'
 
 interface OnlineUser {
   userId: string;
@@ -89,7 +89,7 @@ function Chat () {
       }
     ))
     setNewMessageText('')
-    setMessages(pre => ([...pre, { text: [newMessageText], online: [], sender: id, recipient: selectUserId, id: Date.now() }]))
+    setMessages(pre => ([...pre, { text: [newMessageText], online: [], sender: id, recipient: selectUserId, _id: Date.now() }]))
   }
 
   useEffect(() => {
@@ -119,7 +119,7 @@ function Chat () {
               {
                 userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
               }
-              <Avatar userId={userId} username={username} key={userId} />
+              <Avatar online={true} userId={userId} username={username} key={userId} />
               <span className='text-gray-800 dark:text-white'>{username}</span>
             </section>
           ))
