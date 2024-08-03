@@ -79,7 +79,7 @@ app.get('/messages/:userId', async (req, res) => {
     const messages = await MessageModel.find({
       sender: { $in : [userId, ourUserId] },
       recipient: { $in : [userId, ourUserId] }
-    }).sort({ createdAt: -1 })
+    }).sort({ createdAt: 1 })
 
     return res.status(200).json(messages);
   } catch (error) {
@@ -199,7 +199,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
             text,
             sender: connection.userId,
             recipient,
-            id: newMessageDoc._id
+            _id: newMessageDoc._id
           }));
         })
     }

@@ -40,7 +40,10 @@ function Chat () {
     setWs(ws)
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {
-      connetToWs()
+      setTimeout(() => {
+        console.log('Try to reconnect')
+        connetToWs()
+      }, 1000)
     })
   }
 
@@ -96,12 +99,12 @@ function Chat () {
 
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
 
-  const messagesWithOutDuplicates = uniqBy(messages, 'id')
+  const messagesWithOutDuplicates = uniqBy(messages, '_id')
 
   return (
     <main className="flex h-screen">
       <header className="bg-blue-100 w-1/3 p-2">
-        <nav className='text-blue-500 font-bold flex justify-center gap-2 mb-2'>
+        <nav className='text-blue-500 font-bold flex justify-center gap-2 mb-2 dark:bg-blue-950'>
           <ChatIcon />
           <ul>MernChat</ul>
         </nav>
@@ -139,8 +142,8 @@ function Chat () {
                       <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
                         <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
                           (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
-                          sender: {sender} <br />
-                          my id: {id} <br />
+                          {/* sender: {sender} <br />
+                          my id: {id} <br /> */}
                           {text}
                         </div>
                       </div>
