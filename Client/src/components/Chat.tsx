@@ -13,6 +13,11 @@ interface OnlineUser {
   username: string;
 }
 
+interface OfflineUser {
+  _id: string;
+  username: string;
+}
+
 interface MessageData {
   online: OnlineUser[];
   text?: string[];
@@ -26,6 +31,7 @@ function Chat () {
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
   const [messages, setMessages] = useState<MessageData[]>([])
   const [newMessageText, setNewMessageText] = useState('')
+  const [offlinePeople, setOfflinePeople] = useState<OfflineUser[]>([])
 
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
@@ -99,9 +105,21 @@ function Chat () {
     }
   }, [messages])
 
+  async function getOnlinePeople (): Promise<OfflineUser[]> {
+    const response = await axios.get('/people')
+    return response.data
+  }
+
   useEffect(() => {
-    axios.get('/people')
-      .then(res => console.log(res.data))
+    getOnlinePeople()
+      .then(onlineP => {
+        const offlinePeople = onlineP.filter(p => p._id !== id).filter(p => !onlinePeople.find(op => op.userId === p._id))
+        setOfflinePeople(offlinePeople)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
 
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
@@ -129,6 +147,20 @@ function Chat () {
             </section>
           ))
         }
+        {
+          offlinePeople.map(({ _id, username }) => (
+            <section key={_id} onClick={() => setSelectUserId(_id)}>
+              <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
+                (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
+                {
+                  _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
+                }
+                <Avatar online={false} userId={_id} username={username} key={_id} />
+                <span className='text-gray-800 dark:text-white'>{username}</span>
+              </section>
+            </section>
+          ))
+        }
       </header>
 
       <section className="flex flex-col bg-blue-200 w-2/3 p-2 dark:bg-slate-900">
@@ -150,8 +182,6 @@ function Chat () {
                       <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
                         <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
                           (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
-                          {/* sender: {sender} <br />
-                          my id: {id} <br /> */}
                           {text}
                         </div>
                       </div>
