@@ -31,11 +31,18 @@ function Chat () {
   const { username, id } = useUser()
 
   useEffect(() => {
+    connetToWs()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function connetToWs () {
     const ws = new WebSocket('ws://localhost:4040')
     setWs(ws)
     ws.addEventListener('message', handleMessages)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    ws.addEventListener('close', () => {
+      connetToWs()
+    })
+  }
 
   useEffect(() => {
     if (selectUserId) {
@@ -125,23 +132,23 @@ function Chat () {
           }
           {
             !!selectUserId && (
-                <div className='relative h-full'>
-                  <div className='overflow-y-auto absolute top-0 left-0 right-0 bottom-4'>
-                    {
-                      messagesWithOutDuplicates.map(({ text, sender }, index) => (
-                        <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
-                          <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
-                            (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
-                            sender: {sender} <br />
-                            my id: {id} <br />
-                            {text}
-                          </div>
+              <div className='relative h-full'>
+                <div className='overflow-y-auto absolute top-0 left-0 right-0 bottom-4'>
+                  {
+                    messagesWithOutDuplicates.map(({ text, sender }, index) => (
+                      <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
+                        <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
+                          (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
+                          sender: {sender} <br />
+                          my id: {id} <br />
+                          {text}
                         </div>
-                      ))
-                    }
-                    <div ref={divUnderMessage}></div>
-                  </div>
+                      </div>
+                    ))
+                  }
+                  <div ref={divUnderMessage}></div>
                 </div>
+              </div>
 
             )
           }
