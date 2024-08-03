@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useState, useEffect } from 'react'
 
 // Definir el tipo para el contexto
 type ThemeContextType = {
@@ -20,6 +20,15 @@ export const ThemeProvider = ({ children }: { children : React.ReactNode }) => {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode)
   }
+
+  // Efecto para agregar o quitar la clase 'dark' del body
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark')
+    } else {
+      document.body.classList.remove('dark')
+    }
+  }, [darkMode])
 
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>

@@ -6,6 +6,7 @@ import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
 import axios from 'axios'
+import { useTheme } from '../context/UseTheme'
 
 interface OnlineUser {
   userId: string;
@@ -29,6 +30,7 @@ function Chat () {
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
   const { username, id } = useUser()
+  const { toggleDarkMode } = useTheme()
 
   useEffect(() => {
     connetToWs()
@@ -103,33 +105,34 @@ function Chat () {
 
   return (
     <main className="flex h-screen">
-      <header className="bg-blue-100 w-1/3 p-2">
-        <nav className='text-blue-500 font-bold flex justify-center gap-2 mb-2 dark:bg-blue-950'>
+      <header className="bg-blue-100 w-1/3 p-2 dark:bg-blue-950">
+        <input type="checkbox" onChange={ toggleDarkMode }/>
+        <nav className='text-blue-500 font-bold flex justify-center gap-2 mb-2 '>
           <ChatIcon />
           <ul>MernChat</ul>
         </nav>
         {
           onlinePeopleWithoutMe.map(({ userId, username }) => (
             <section key={userId} onClick={() => setSelectUserId(userId)}
-              className={'p-2 border border-b-2 border-gray-300 flex items-center gap-2 cursor-pointer rounded-md mb-1 ' +
-                (userId === selectUserId ? 'bg-blue-200' : '')}>
+              className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
+                (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
               {
                 userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
               }
               <Avatar userId={userId} username={username} key={userId} />
-              <span className='text-gray-800'>{username}</span>
+              <span className='text-gray-800 dark:text-white'>{username}</span>
             </section>
           ))
         }
       </header>
 
-      <section className="flex flex-col bg-blue-200 w-2/3 p-2">
+      <section className="flex flex-col bg-blue-200 w-2/3 p-2 dark:bg-slate-900">
         <div className='flex-grow'>
           {
             !selectUserId && (
               <div className='flex items-center justify-center h-full gap-2'>
                 <ArrowIconLeft />
-                <span className='text-gray-800'>Seleccione un chat para iniciar conversación</span>
+                <span className='text-gray-800 dark:text-white'>Seleccione un chat para iniciar conversación</span>
               </div>
             )
           }
