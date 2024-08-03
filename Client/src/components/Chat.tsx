@@ -99,6 +99,11 @@ function Chat () {
     }
   }, [messages])
 
+  useEffect(() => {
+    axios.get('/people')
+      .then(res => console.log(res.data))
+  }, [onlinePeople])
+
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
 
   const messagesWithOutDuplicates = uniqBy(messages, '_id')
