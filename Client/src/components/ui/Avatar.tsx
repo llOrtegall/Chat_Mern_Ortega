@@ -10,7 +10,7 @@ export const Avatar = ({ userId, username, online }: { userId: string, username:
       <span className='w-full text-center font-semibold opacity-85'>{username[0].toUpperCase()}</span>
       {
         online === true
-          ? <div className="absolute w-3 h-3 bg-green-600 border-2 border-gray-100 shadow-md shadow-gray-400 bottom-0 right-0 rounded-full "></div>
+          ? <div className="absolute w-3 h-3 bg-green-500 border-2 border-gray-100 shadow-md shadow-gray-400 bottom-0 right-0 rounded-full "></div>
           : <div className="absolute w-3 h-3 bg-gray-400 border-2 border-gray-100 shadow-md shadow-gray-400 bottom-0 right-0 rounded-full "></div>
       }
     </div>

@@ -21,7 +21,7 @@ export function UserContextProvider ({ children }: { children: ReactNode }) {
         setId(res.data.id)
       })
       .catch(err => console.error(err))
-  }, [])
+  }, [username])
 
   return (
     <UserContext.Provider value={{ username, setUsername, id, setId }}>

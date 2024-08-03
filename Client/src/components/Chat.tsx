@@ -35,7 +35,7 @@ function Chat () {
 
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
-  const { username, id } = useUser()
+  const { username, id, setId, setUsername } = useUser()
   const { toggleDarkMode } = useTheme()
 
   useEffect(() => {
@@ -49,7 +49,6 @@ function Chat () {
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {
       setTimeout(() => {
-        console.log('Try to reconnect')
         connetToWs()
       }, 1000)
     })
@@ -98,6 +97,20 @@ function Chat () {
     setMessages(pre => ([...pre, { text: [newMessageText], online: [], sender: id, recipient: selectUserId, _id: Date.now() }]))
   }
 
+  const handleLogout = () => {
+    axios.post('/logout')
+      .then((res) => {
+        if (res.status === 200) {
+          setUsername('')
+          setId('')
+          setWs(null)
+        }
+      })
+      .finally(() => {
+        window.location.href = '/'
+      })
+  }
+
   useEffect(() => {
     const div = divUnderMessage.current
     if (div) {
@@ -119,7 +132,7 @@ function Chat () {
       .catch(error => {
         console.log(error)
       })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
 
   const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
@@ -128,39 +141,45 @@ function Chat () {
 
   return (
     <main className="flex h-screen">
-      <header className="bg-blue-100 w-1/3 p-2 dark:bg-blue-950">
-        <input type="checkbox" onChange={ toggleDarkMode }/>
-        <nav className='text-blue-500 font-bold flex justify-center gap-2 mb-2 '>
+      <header className="flex flex-col bg-blue-100 w-1/3 p-2 dark:bg-blue-950 ">
+        <nav className='flex-grow-0 text-blue-500 font-bold flex justify-center items-center gap-2 mb-2 '>
           <ChatIcon />
           <ul>MernChat</ul>
+          <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
-        {
-          onlinePeopleWithoutMe.map(({ userId, username }) => (
-            <section key={userId} onClick={() => setSelectUserId(userId)}
-              className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
-              {
-                userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
-              }
-              <Avatar online={true} userId={userId} username={username} key={userId} />
-              <span className='text-gray-800 dark:text-white'>{username}</span>
-            </section>
-          ))
-        }
-        {
-          offlinePeople.map(({ _id, username }) => (
-            <section key={_id} onClick={() => setSelectUserId(_id)}>
-              <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
+        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
+        <section className='h-full'>
+          {
+            onlinePeopleWithoutMe.map(({ userId, username }) => (
+              <section key={userId} onClick={() => setSelectUserId(userId)}
+                className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
+                  (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
                 {
-                  _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
+                  userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
                 }
-                <Avatar online={false} userId={_id} username={username} key={_id} />
+                <Avatar online={true} userId={userId} username={username} key={userId} />
                 <span className='text-gray-800 dark:text-white'>{username}</span>
               </section>
-            </section>
-          ))
-        }
+            ))
+          }
+          {
+            offlinePeople.map(({ _id, username }) => (
+              <section key={_id} onClick={() => setSelectUserId(_id)}>
+                <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
+                  (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
+                  {
+                    _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
+                  }
+                  <Avatar online={false} userId={_id} username={username} key={_id} />
+                  <span className='text-gray-800 dark:text-white'>{username}</span>
+                </section>
+              </section>
+            ))
+          }
+        </section>
+        <div className='flex-grow'>
+          <button onClick={handleLogout} className='bg-blue-500 text-white p-2 rounded-md w-full hover:bg-blue-700'>Logout</button>
+        </div>
       </header>
 
       <section className="flex flex-col bg-blue-200 w-2/3 p-2 dark:bg-slate-900">
@@ -200,7 +219,7 @@ function Chat () {
             <form className='flex gap-2' onSubmit={sendMessage}>
               <input type="text" placeholder='type your message here'
                 value={newMessageText} onChange={e => setNewMessageText(e.target.value)}
-                className="bg-white border flex-grow  p-2 rounded-md" />
+                className="bg-white border flex-grow p-2 rounded-md" />
               <button className="bg-blue-600 p-2 text-white rounded-md">
                 <SendIcon />
               </button>

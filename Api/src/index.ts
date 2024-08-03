@@ -1,19 +1,23 @@
+import express, { Request } from 'express';
 import cookieParser from 'cookie-parser';
+import ws, { WebSocket } from 'ws';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import express, { Request } from 'express';
 import bcryp from 'bcryptjs';
 import cors from 'cors';
 import 'dotenv/config';
-import ws, { WebSocket } from 'ws';
 
 // TODO: Imports models
 import { MessageModel } from './model/Message.model';
 import { UserModel } from './model/User.model';
+import { clearInterval } from 'timers';
 
 interface ExtendedWebSocket extends WebSocket {
   userId?: string;
   username?: string;
+  isAlive?: boolean;
+  timer?: NodeJS.Timeout;
+  deathTimer?: NodeJS.Timeout;
 }
 
 interface MessageDataInt {
@@ -164,6 +168,9 @@ app.post('/register', async (req, res) => {
 
 });
 
+app.post('/logout', (req, res) => {
+  res.cookie('token', '', { sameSite: 'none', secure: true }).status(200).json('Logged out');
+});
 
 const server = app.listen(PORT, () => {
   console.log(`API listening at http://localhost:${PORT}`);
@@ -174,6 +181,30 @@ const wss = new ws.WebSocketServer({ server });
 
 wss.on('connection', (connection: ExtendedWebSocket, req) => {
 
+  function notifyOnlineUsers(){
+    [...wss.clients].forEach((client: ExtendedWebSocket) => {
+      client.send(JSON.stringify({
+        online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, username: client.username }))
+      }));
+    });
+  }
+
+  connection.isAlive = true;
+
+  connection.timer = setInterval(() => {
+    connection.ping();
+    connection.deathTimer = setTimeout(() => {
+      connection.isAlive = false;
+      clearInterval(connection.timer);
+      connection.terminate();
+      notifyOnlineUsers();
+    }, 2000);
+  }, 10000);
+
+  connection.on('pong', () => {
+    clearInterval(connection.deathTimer);
+  });
+ 
   // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y username
   const cookies = req.headers.cookie;
   if (cookies) {
@@ -215,10 +246,6 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   });
 
   // TODO: enviar a todos los clientes conectados la lista de usuarios conectados
-  [...wss.clients].forEach((client: ExtendedWebSocket) => {
-    client.send(JSON.stringify({
-      online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, username: client.username }))
-    }));
-  });
+  notifyOnlineUsers();
 
 });
