@@ -5,6 +5,7 @@ import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
+import axios from 'axios'
 
 interface OnlineUser {
   userId: string;
@@ -35,6 +36,18 @@ function Chat () {
     ws.addEventListener('message', handleMessages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (selectUserId) {
+      axios.get('/messages/' + selectUserId)
+        .then(response => {
+          setMessages(response.data)
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
+  }, [selectUserId])
 
   const showOnlineUsers = (peopleArray: OnlineUser[]) => {
     const people = {} as Record<string, OnlineUser>
