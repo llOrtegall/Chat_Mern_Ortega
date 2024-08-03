@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import express from 'express';
+import express, { Request } from 'express';
 import bcryp from 'bcryptjs';
 import cors from 'cors';
 import 'dotenv/config';
@@ -21,6 +21,12 @@ interface MessageDataInt {
   text: string;
 }
 
+interface UserDataInt {
+  userId: string;
+  username: string;
+  iat: number;
+}
+
 mongoose.connect(process.env.MONGO_URL as string)
 
 
@@ -31,6 +37,25 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 const ORIGIN_URL = process.env.ORIGIN_URL as string;
 const ORIGIN_URL1 = process.env.ORIGIN_URL1 as string;
 const SALT = parseInt(process.env.SALT as string);
+
+async function getUserDataFromRequest(req: Request): Promise<UserDataInt> {
+  return new Promise((resolve, reject) => {
+    const token = req.cookies.token;
+    if (token) {
+      jwt.verify(token, JWT_SECRET, {}, (err, userData) => {
+        if (err) return reject(err);
+        // Type assertion to ensure userData is of type UserDataInt
+        if (userData && typeof userData !== 'string') {
+          resolve(userData as UserDataInt);
+        } else {
+          reject('Invalid token payload');
+        }
+      });
+    } else {
+      reject('No token found');
+    }
+  });
+}
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -43,6 +68,24 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.get('/messages/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const userData = await getUserDataFromRequest(req)
+    
+    const ourUserId = userData.userId;
+    const messages = await MessageModel.find({
+      sender: { $in : [userId, ourUserId] },
+      recipient: { $in : [userId, ourUserId] }
+    }).sort({ createdAt: -1 })
+
+    return res.status(200).json(messages);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+})
 
 app.get('/profile', async (req, res) => {
   const token = req.cookies.token;
