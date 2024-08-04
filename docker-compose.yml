@@ -9,6 +9,8 @@ services:
     volumes:
       - ./client/dist:/usr/share/nginx/html
       - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - api
 
   api:
     build:
@@ -24,3 +26,5 @@ services:
   db:
     image: mongo:latest
     container_name: db_chat
+    ports:
+      - "27017:27017"
