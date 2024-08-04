@@ -1,6 +1,4 @@
-import { JWT_SECRET, ORIGIN_URL, ORIGIN_URL1, PORT } from './config'
-import { ExtendedWebSocket, MessageDataInt } from './types/types'
-
+// TODO: Importar las dependencias necesarias
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -8,10 +6,16 @@ import morgan from 'morgan';
 import cors from 'cors';
 import ws from 'ws';
 
-import { testDatabaseConnection } from './test/conectionDb';
-import { MessageModel } from './model/Message.model';
+// TODO: Importar las variables de entorno  y types
+import { JWT_SECRET, ORIGIN_URL, ORIGIN_URL1, PORT } from './config'
+import { ExtendedWebSocket, MessageDataInt } from './types/types'
+
+// TODO: Importar las rutas de la API
 import messageRouter from './routes/message.routes';
 import userRouter from './routes/user.routes';
+
+import { testDatabaseConnection } from './test/conectionDb';
+import { MessageModel } from './model/Message.model';
 import { clearInterval } from 'timers';
 
 const app = express();
