@@ -31,7 +31,11 @@ interface UserDataInt {
   iat: number;
 }
 
-mongoose.connect(process.env.MONGO_URL as string)
+try {
+  mongoose.connect(process.env.MONGO_URL as string)
+} catch (error) {
+  console.log('Error connecting to MongoDB', error);
+}
 
 
 const app = express();
