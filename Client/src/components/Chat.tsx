@@ -1,3 +1,4 @@
+import { MessageData, OfflineUser, OnlineUser } from '../types/type'
 import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useEffect, useRef, useState } from 'react'
 import { useUser } from '../context/UserContext'
@@ -7,23 +8,6 @@ import { ChatIcon } from './icons/ChatIcon'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
 import axios from 'axios'
-
-interface OnlineUser {
-  userId: string;
-  username: string;
-}
-
-interface OfflineUser {
-  _id: string;
-  username: string;
-}
-
-interface MessageData {
-  online: OnlineUser[];
-  text?: string[];
-  isOur?: boolean;
-  sender?: string;
-}
 
 function Chat () {
   const [ws, setWs] = useState<WebSocket | null>(null)
