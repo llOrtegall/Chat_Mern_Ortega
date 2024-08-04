@@ -7,7 +7,7 @@ import cors from 'cors';
 import ws from 'ws';
 
 // TODO: Importar las variables de entorno  y types
-import { JWT_SECRET, ORIGIN_URL, ORIGIN_URL1, PORT } from './config'
+import { JWT_SECRET, ORIGIN_URL, PORT } from './config'
 import { ExtendedWebSocket, MessageDataInt } from './types/types'
 
 // TODO: Importar las rutas de la API
@@ -24,7 +24,7 @@ app.disable('x-powered-by');
 
 app.use(cookieParser());
 
-app.use(cors({ origin: [ORIGIN_URL, ORIGIN_URL1], credentials: true }));
+app.use(cors({ origin: [ORIGIN_URL], credentials: true }));
 
 app.use(morgan('dev'));
 
@@ -32,9 +32,13 @@ app.use(express.json());
 
 // TODO: Rutas de la API
 
-app.use(userRouter);
+app.get('/', (req, res) => {
+  res.send('API running');
+});
 
-app.use(messageRouter);
+app.use('/api', userRouter);
+
+app.use('/api', messageRouter);
 
 
 const server = app.listen(PORT, () => {

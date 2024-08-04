@@ -28,7 +28,7 @@ function Chat () {
   }, [])
 
   function connetToWs () {
-    const ws = new WebSocket('ws://localhost:4040')
+    const ws = new WebSocket('/wss')
     setWs(ws)
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {
