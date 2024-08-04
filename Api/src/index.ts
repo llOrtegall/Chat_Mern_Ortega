@@ -1,180 +1,37 @@
-import express, { Request } from 'express';
+import { JWT_SECRET, ORIGIN_URL, ORIGIN_URL1, PORT } from './config'
+import { ExtendedWebSocket, MessageDataInt } from './types/types'
+
 import cookieParser from 'cookie-parser';
-import ws, { WebSocket } from 'ws';
-import mongoose from 'mongoose';
+import express from 'express';
 import jwt from 'jsonwebtoken';
-import bcryp from 'bcryptjs';
+import morgan from 'morgan';
 import cors from 'cors';
-import 'dotenv/config';
+import ws from 'ws';
 
-// TODO: Imports models
+import { testDatabaseConnection } from './test/conectionDb';
 import { MessageModel } from './model/Message.model';
-import { UserModel } from './model/User.model';
+import messageRouter from './routes/message.routes';
+import userRouter from './routes/user.routes';
 import { clearInterval } from 'timers';
-
-interface ExtendedWebSocket extends WebSocket {
-  userId?: string;
-  username?: string;
-  isAlive?: boolean;
-  timer?: NodeJS.Timeout;
-  deathTimer?: NodeJS.Timeout;
-}
-
-interface MessageDataInt {
-  recipient: string;
-  text: string;
-}
-
-interface UserDataInt {
-  userId: string;
-  username: string;
-  iat: number;
-}
-
-try {
-  mongoose.connect(process.env.MONGO_URL as string)
-} catch (error) {
-  console.log('Error connecting to MongoDB', error);
-}
-
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET as string;
-const ORIGIN_URL = process.env.ORIGIN_URL as string;
-const ORIGIN_URL1 = process.env.ORIGIN_URL1 as string;
-const SALT = parseInt(process.env.SALT as string);
-
-async function getUserDataFromRequest(req: Request): Promise<UserDataInt> {
-  return new Promise((resolve, reject) => {
-    const token = req.cookies.token;
-    if (token) {
-      jwt.verify(token, JWT_SECRET, {}, (err, userData) => {
-        if (err) return reject(err);
-        // Type assertion to ensure userData is of type UserDataInt
-        if (userData && typeof userData !== 'string') {
-          resolve(userData as UserDataInt);
-        } else {
-          reject('Invalid token payload');
-        }
-      });
-    } else {
-      reject('No token found');
-    }
-  });
-}
-
 app.disable('x-powered-by');
+
 app.use(cookieParser());
-app.use(cors({
-  origin: [ORIGIN_URL, ORIGIN_URL1],
-  credentials: true
-}));
+
+app.use(cors({ origin: [ORIGIN_URL, ORIGIN_URL1], credentials: true }));
+
+app.use(morgan('dev'));
+
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// TODO: Rutas de la API
 
-app.get('/messages/:userId', async (req, res) => {
-  const { userId } = req.params;
+app.use(userRouter);
 
-  try {
-    const userData = await getUserDataFromRequest(req)
-    
-    const ourUserId = userData.userId;
-    const messages = await MessageModel.find({
-      sender: { $in : [userId, ourUserId] },
-      recipient: { $in : [userId, ourUserId] }
-    }).sort({ createdAt: 1 })
+app.use(messageRouter);
 
-    return res.status(200).json(messages);
-  } catch (error) {
-    return res.status(500).json(error);
-  }
-})
-
-app.get('/profile', async (req, res) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(404).json('No token found');
-
-  try {
-    jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
-      if (err) return res.status(401).json('Unauthorized');
-
-      const user = await UserModel.findById(decoded.userId);
-      if (!user) return res.status(404).json('User not found');
-
-      return res.status(200).json({ id: user._id, username: user.username });
-    });
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
-
-app.get('/people', async (req, res) => {
-  try {
-    const users = await UserModel.find({}, {'_id': 1, username: 1 })
-    return res.status(200).json(users);
-  } catch (error) {
-    return res.status(500).json(error);
-  }
-})
-
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const user = await UserModel.findOne({ username });
-    if (!user) return res.status(404).json('User not found');
-
-    const passwordMatch = bcryp.compareSync(password, user.password);
-    if (!passwordMatch) return res.status(401).json('Clave incorrecta');
-
-    jwt.sign({ userId: user._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
-      if (err) throw err;
-      if (token) {
-        res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({ id: user._id });
-      } else {
-        res.status(500).json('Token generation failed');
-      }
-    });
-
-  } catch (error) {
-    res.status(400).json(error);
-  }
-});
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    const hashedPassword = bcryp.hashSync(password, SALT);
-
-    const newUser = await UserModel.create({
-      username: username,
-      password: hashedPassword
-    });
-
-    jwt.sign({ userId: newUser._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
-      if (err) throw err;
-      if (token) {
-        res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({ id: newUser._id });
-      } else {
-        res.status(500).json('Token generation failed');
-      }
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json(error);
-  }
-
-});
-
-app.post('/logout', (req, res) => {
-  res.cookie('token', '', { sameSite: 'none', secure: true }).status(200).json('Logged out');
-});
 
 const server = app.listen(PORT, () => {
   console.log(`API listening at http://localhost:${PORT}`);
@@ -185,7 +42,7 @@ const wss = new ws.WebSocketServer({ server });
 
 wss.on('connection', (connection: ExtendedWebSocket, req) => {
 
-  function notifyOnlineUsers(){
+  function notifyOnlineUsers() {
     [...wss.clients].forEach((client: ExtendedWebSocket) => {
       client.send(JSON.stringify({
         online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, username: client.username }))
@@ -208,7 +65,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   connection.on('pong', () => {
     clearInterval(connection.deathTimer);
   });
- 
+
   // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y username
   const cookies = req.headers.cookie;
   if (cookies) {
@@ -253,3 +110,8 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   notifyOnlineUsers();
 
 });
+
+
+testDatabaseConnection()
+  .then(() => console.log('Database connection successful'))
+  .catch((error) => console.error('Error connecting to database', error));
