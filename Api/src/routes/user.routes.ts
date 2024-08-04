@@ -10,7 +10,7 @@ userRouter.post('/register', registerUser);
 
 userRouter.get('/profile', getProfile);
 
-userRouter.get('/logout', logoutProfile);
+userRouter.post('/logout', logoutProfile);
 
 userRouter.get('/people', getUserDataUsers);
 

@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: api_chat:v0.2
+    container_name: api_chat
+    ports:
+      - "4040:4040"
+    depends_on:
+      - db
+
+  client:
+    image: nginx:stable-alpine3.19-slim
+    container_name: client_chat
+    ports:
+      - "8080:80"
+    volumes:
+      - ./client/dist:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
+  
+  db:
+    image: mongo:latest
+    container_name: db_chat
