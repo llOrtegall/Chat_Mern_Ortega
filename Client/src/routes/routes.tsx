@@ -5,15 +5,9 @@ import Chat from '../components/Chat'
 function Routes () {
   const { username } = useUser()
 
-  if (username) {
-    return <Chat />
-  }
+  if (username) return <Chat />
 
-  return (
-    <>
-      <LoginAndRegisterForm />
-    </>
-  )
+  return <LoginAndRegisterForm />
 }
 
 export default Routes
