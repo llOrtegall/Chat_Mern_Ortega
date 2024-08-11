@@ -3,7 +3,7 @@ import Routes from './routes/routes'
 import axios from 'axios'
 
 function App () {
-  axios.defaults.baseURL = '/api'
+  axios.defaults.baseURL = 'api-chat/'
   axios.defaults.withCredentials = true
 
   return (

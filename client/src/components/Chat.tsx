@@ -28,7 +28,7 @@ function Chat () {
   }, [])
 
   function connetToWs () {
-    const ws = new WebSocket('ws://serverortega.ddns.net/')
+    const ws = new WebSocket('api-wss/')
     setWs(ws)
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {

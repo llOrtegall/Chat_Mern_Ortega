@@ -6,6 +6,6 @@ COPY . .
 
 RUN sh -c 'yarn && yarn build'
 
-EXPOSE 4040
+EXPOSE 80
 
 CMD ["yarn", "start"]

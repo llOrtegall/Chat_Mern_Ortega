@@ -36,9 +36,9 @@ app.get('/', (req, res) => {
   res.send('API running');
 });
 
-app.use('/api', userRouter);
+app.use(userRouter);
 
-app.use('/api', messageRouter);
+app.use(messageRouter);
 
 
 const server = app.listen(PORT, () => {
