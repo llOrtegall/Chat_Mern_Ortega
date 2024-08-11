@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 .env
 mongo-data
+certs
+
+docker-compose.yml
+nginx.conf
