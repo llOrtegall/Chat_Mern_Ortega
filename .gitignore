@@ -28,3 +28,4 @@ certs
 
 docker-compose.yml
 nginx.conf
+data

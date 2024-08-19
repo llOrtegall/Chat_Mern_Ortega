@@ -28,7 +28,7 @@ function Chat () {
   }, [])
 
   function connetToWs () {
-    const ws = new WebSocket('api-wss/')
+    const ws = new WebSocket('ws://192.168.1.6:4040')
     setWs(ws)
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {

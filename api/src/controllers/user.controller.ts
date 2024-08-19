@@ -38,7 +38,7 @@ const loginUser = async (req: Request, res: Response) => {
     jwt.sign({ userId: user._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
       if (err) throw err;
       if (token) {
-        res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({ id: user._id });
+        res.cookie('token', token, { sameSite: 'lax', secure: false }).status(201).json({ id: user._id });
       } else {
         res.status(500).json('Token generation failed');
       }
@@ -65,7 +65,7 @@ const registerUser = async (req: Request, res: Response) => {
     jwt.sign({ userId: newUser._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
       if (err) throw err;
       if (token) {
-        res.cookie('token', token, { sameSite: 'none', secure: true }).status(201).json({ id: newUser._id });
+        res.cookie('token', token, { sameSite: 'lax', secure: false }).status(201).json({ id: newUser._id });
       } else {
         res.status(500).json('Token generation failed');
       }

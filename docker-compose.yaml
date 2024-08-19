@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  db-chat:
+    image: mongo:latest
+    container_name: db-chat
+    restart: always
+    ports:
+      - "9010:27017"
+    volumes:
+      - ./data:/data/db
