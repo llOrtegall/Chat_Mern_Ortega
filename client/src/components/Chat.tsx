@@ -3,13 +3,14 @@ import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useEffect, useRef, useState } from 'react'
 import { useUser } from '../context/UserContext'
 import { useTheme } from '../context/UseTheme'
+import { ShowMessages } from './ShowMessages'
+import { ContatsViews } from './ContactsView'
 import { ChatIcon } from './icons/ChatIcon'
 import { FormSensMsg } from './FormSensMsg'
 import { WS_API } from '../utils/constans'
-import { Avatar } from './ui/Avatar'
+
 import { uniqBy } from 'lodash'
 import axios from 'axios'
-import { ShowMessages } from './ShowMessages'
 
 function Chat() {
   const [ws, setWs] = useState<WebSocket | null>(null)
@@ -136,35 +137,9 @@ function Chat() {
           <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
         <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
-        <section className='h-full'>
-          {
-            onlinePeopleWithoutMe.map(({ userId, username }) => (
-              <section key={userId} onClick={() => setSelectUserId(userId)}
-                className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                  (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
-                {
-                  userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
-                }
-                <Avatar online={true} userId={userId} username={username} key={userId} />
-                <span className='text-gray-800 dark:text-white'>{username}</span>
-              </section>
-            ))
-          }
-          {
-            offlinePeople.map(({ _id, username }) => (
-              <section key={_id} onClick={() => setSelectUserId(_id)}>
-                <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                  (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
-                  {
-                    _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
-                  }
-                  <Avatar online={false} userId={_id} username={username} key={_id} />
-                  <span className='text-gray-800 dark:text-white'>{username}</span>
-                </section>
-              </section>
-            ))
-          }
-        </section>
+
+        <ContatsViews offlinePeople={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
+
         <div className='flex-grow'>
           <button onClick={handleLogout} className='bg-blue-500 text-white p-2 rounded-md w-full hover:bg-blue-700'>Logout</button>
         </div>
