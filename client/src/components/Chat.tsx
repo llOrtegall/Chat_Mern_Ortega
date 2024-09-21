@@ -20,7 +20,7 @@ function Chat () {
 
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
-  const { username, id, setId, setUsername } = useUser()
+  const { email, id, setId, setEmail } = useUser()
   const { toggleDarkMode } = useTheme()
 
   useEffect(() => {
@@ -54,8 +54,8 @@ function Chat () {
   const showOnlineUsers = (peopleArray: OnlineUser[]) => {
     const people = {} as Record<string, OnlineUser>
 
-    peopleArray.forEach(({ userId, username }) => {
-      people[userId] = { userId, username }
+    peopleArray.forEach(({ userId, email }) => {
+      people[userId] = { userId, email }
     })
 
     setOnlinePeople(Object.values(people))
@@ -86,7 +86,7 @@ function Chat () {
     axios.post('/logout')
       .then((res) => {
         if (res.status === 200) {
-          setUsername('')
+          setEmail('')
           setId('')
           setWs(null)
         }
@@ -120,7 +120,7 @@ function Chat () {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
 
-  const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
+  const onlinePeopleWithoutMe = onlinePeople.filter(({ email: onlineemail }) => onlineemail !== email)
 
   const messagesWithOutDuplicates = uniqBy(messages, '_id')
 
@@ -132,31 +132,31 @@ function Chat () {
           <ul>MernChat</ul>
           <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
-        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
+        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {email}</h2>
         <section className='h-full'>
           {
-            onlinePeopleWithoutMe.map(({ userId, username }) => (
+            onlinePeopleWithoutMe.map(({ userId, email }) => (
               <section key={userId} onClick={() => setSelectUserId(userId)}
                 className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
                   (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
                 {
                   userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
                 }
-                <Avatar online={true} userId={userId} username={username} key={userId} />
-                <span className='text-gray-800 dark:text-white'>{username}</span>
+                <Avatar online={true} userId={userId} email={email} key={userId} />
+                <span className='text-gray-800 dark:text-white'>{email}</span>
               </section>
             ))
           }
           {
-            offlinePeople.map(({ _id, username }) => (
+            offlinePeople.map(({ _id, email }) => (
               <section key={_id} onClick={() => setSelectUserId(_id)}>
                 <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
                   (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
                   {
                     _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
                   }
-                  <Avatar online={false} userId={_id} username={username} key={_id} />
-                  <span className='text-gray-800 dark:text-white'>{username}</span>
+                  <Avatar online={false} userId={_id} email={email} key={_id} />
+                  <span className='text-gray-800 dark:text-white'>{email}</span>
                 </section>
               </section>
             ))

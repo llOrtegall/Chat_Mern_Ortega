@@ -53,7 +53,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   function notifyOnlineUsers() {
     [...wss.clients].forEach((client: ExtendedWebSocket) => {
       client.send(JSON.stringify({
-        online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, username: client.username }))
+        online: [...wss.clients].map((client: ExtendedWebSocket) => ({ userId: client.userId, email: client.email }))
       }));
     });
   }
@@ -74,7 +74,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
     clearInterval(connection.deathTimer);
   });
 
-  // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y username
+  // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y email
   const cookies = req.headers.cookie;
   if (cookies) {
     const tokenCookieString = cookies.split(';').find((cookie: string) => cookie.includes('token'));
@@ -85,10 +85,10 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
         jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
           if (err) throw err;
 
-          const { userId, username } = decoded;
+          const { userId, email } = decoded;
 
           connection.userId = userId;
-          connection.username = username;
+          connection.email = email;
 
         });
       }

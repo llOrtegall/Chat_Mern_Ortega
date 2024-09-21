@@ -1,6 +1,6 @@
 import { useUser } from '../context/UserContext'
 import LoginPage from '../pages/LoginPage'
-import { Outlet } from 'react-router-dom'
+import Chat from '../components/Chat'
 
 export default function Root () {
   const { id, email, } = useUser()
@@ -9,10 +9,5 @@ export default function Root () {
     return <LoginPage />
   }
 
-  return (
-    <div>
-      <h1>Root</h1>
-      <Outlet />
-    </div>
-  )
+  return <Chat />
 }

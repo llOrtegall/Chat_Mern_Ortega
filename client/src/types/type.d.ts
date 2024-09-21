@@ -1,11 +1,11 @@
 export interface OnlineUser {
   userId: string;
-  username: string;
+  email: string;
 }
 
 export interface OfflineUser {
   _id: string;
-  username: string;
+  email: string;
 }
 
 export interface MessageData {
