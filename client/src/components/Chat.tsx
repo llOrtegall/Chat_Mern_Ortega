@@ -5,6 +5,7 @@ import { useUser } from '../context/UserContext'
 import { useTheme } from '../context/UseTheme'
 import { SendIcon } from './icons/SendIcon'
 import { ChatIcon } from './icons/ChatIcon'
+import { WS_API } from '../utils/constans'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
 import axios from 'axios'
@@ -28,7 +29,7 @@ function Chat () {
   }, [])
 
   function connetToWs () {
-    const ws = new WebSocket('ws://192.168.1.6:4040')
+    const ws = new WebSocket(`${WS_API}`)
     setWs(ws)
     ws.addEventListener('message', handleMessages)
     ws.addEventListener('close', () => {
