@@ -26,6 +26,8 @@ export function UserContextProvider ({ children }: { children: ReactNode }) {
       .catch(err => console.error(err))
   }, [isAuthenticated])
 
+  console.log(isAuthenticated);
+
   return (
     <UserContext.Provider value={{ email, setEmail, id, setId, isAuthenticated, setIsAuthenticated }}>
       {children}

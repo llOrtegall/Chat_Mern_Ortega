@@ -96,7 +96,7 @@ const logoutProfile = async (req: Request, res: Response) => {
 
 const getUserDataUsers = async (req: Request, res: Response) => {
   try {
-    const users = await UserModel.find({}, { '_id': 1, username: 1 })
+    const users = await UserModel.find({}, { '_id': 1, email: 1 })
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json(error);
