@@ -22,7 +22,7 @@ function Chat() {
 
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
-  const { username, id, setId, setUsername } = useUser()
+  const { email, id, setId, setEmail } = useUser()
   const { toggleDarkMode } = useTheme()
 
   useEffect(() => {
@@ -56,8 +56,8 @@ function Chat() {
   const showOnlineUsers = (peopleArray: OnlineUser[]) => {
     const people = {} as Record<string, OnlineUser>
 
-    peopleArray.forEach(({ userId, username }) => {
-      people[userId] = { userId, username }
+    peopleArray.forEach(({ userId, email }) => {
+      people[userId] = { userId, email }
     })
 
     setOnlinePeople(Object.values(people))
@@ -90,7 +90,7 @@ function Chat() {
     axios.post('/logout')
       .then((res) => {
         if (res.status === 200) {
-          setUsername('')
+          setEmail('')
           setId('')
           setWs(null)
         }
@@ -124,7 +124,7 @@ function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
 
-  const onlinePeopleWithoutMe = onlinePeople.filter(({ username: onlineUsername }) => onlineUsername !== username)
+  const onlinePeopleWithoutMe = onlinePeople.filter(({ email: onlineemail }) => onlineemail !== email)
 
   const messagesWithOutDuplicates = uniqBy(messages, '_id')
 
@@ -136,7 +136,7 @@ function Chat() {
           <ul>MernChat</ul>
           <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
-        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
+        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {email}</h2>
 
         <ContatsViews offlinePeople={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
 
