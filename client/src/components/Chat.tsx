@@ -3,14 +3,16 @@ import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useEffect, useRef, useState } from 'react'
 import { useUser } from '../context/UserContext'
 import { useTheme } from '../context/UseTheme'
-import { SendIcon } from './icons/SendIcon'
+import { ShowMessages } from './ShowMessages'
+import { ContatsViews } from './ContactsView'
 import { ChatIcon } from './icons/ChatIcon'
+import { FormSensMsg } from './FormSensMsg'
 import { WS_API } from '../utils/constans'
-import { Avatar } from './ui/Avatar'
+
 import { uniqBy } from 'lodash'
 import axios from 'axios'
 
-function Chat () {
+function Chat() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
@@ -28,7 +30,7 @@ function Chat () {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function connetToWs () {
+  function connetToWs() {
     const ws = new WebSocket(`${WS_API}`)
     setWs(ws)
     ws.addEventListener('message', handleMessages)
@@ -62,6 +64,8 @@ function Chat () {
   }
 
   const handleMessages = (event: MessageEvent) => {
+    console.log(event.data);
+
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
       showOnlineUsers(messageData.online)
@@ -103,7 +107,7 @@ function Chat () {
     }
   }, [messages])
 
-  async function getOnlinePeople (): Promise<OfflineUser[]> {
+  async function getOnlinePeople(): Promise<OfflineUser[]> {
     const response = await axios.get('/people')
     return response.data
   }
@@ -132,36 +136,10 @@ function Chat () {
           <ul>MernChat</ul>
           <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
-        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {email}</h2>
-        <section className='h-full'>
-          {
-            onlinePeopleWithoutMe.map(({ userId, email }) => (
-              <section key={userId} onClick={() => setSelectUserId(userId)}
-                className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                  (userId === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
-                {
-                  userId === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
-                }
-                <Avatar online={true} userId={userId} email={email} key={userId} />
-                <span className='text-gray-800 dark:text-white'>{email}</span>
-              </section>
-            ))
-          }
-          {
-            offlinePeople.map(({ _id, email }) => (
-              <section key={_id} onClick={() => setSelectUserId(_id)}>
-                <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
-                  (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
-                  {
-                    _id === selectUserId && <span className='bg-blue-600 w-1 h-10 rounded-full'></span>
-                  }
-                  <Avatar online={false} userId={_id} email={email} key={_id} />
-                  <span className='text-gray-800 dark:text-white'>{email}</span>
-                </section>
-              </section>
-            ))
-          }
-        </section>
+        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
+
+        <ContatsViews offlinePeople={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
+
         <div className='flex-grow'>
           <button onClick={handleLogout} className='bg-blue-500 text-white p-2 rounded-md w-full hover:bg-blue-700'>Logout</button>
         </div>
@@ -178,40 +156,13 @@ function Chat () {
             )
           }
           {
-            !!selectUserId && (
-              <div className='relative h-full'>
-                <div className='overflow-y-auto absolute top-0 left-0 right-0 bottom-4'>
-                  {
-                    messagesWithOutDuplicates.map(({ text, sender }, index) => (
-                      <div key={index} className={(sender === id ? 'text-right' : 'text-left')}>
-                        <div className={'text-left inline-block p-2 my-2 rounded-md text-sm ' +
-                          (sender === id ? 'bg-blue-500 text-white ' : 'bg-white text-gray-500')}>
-                          {text}
-                        </div>
-                      </div>
-                    ))
-                  }
-                  <div ref={divUnderMessage}></div>
-                </div>
-              </div>
-
-            )
+            !!selectUserId && <ShowMessages id={id} messages={messagesWithOutDuplicates} refScroll={divUnderMessage} />
           }
         </div>
 
         {
-          !!selectUserId && (
-            <form className='flex gap-2' onSubmit={sendMessage}>
-              <input type="text" placeholder='type your message here'
-                value={newMessageText} onChange={e => setNewMessageText(e.target.value)}
-                className="bg-white border flex-grow p-2 rounded-md" />
-              <button className="bg-blue-600 p-2 text-white rounded-md">
-                <SendIcon />
-              </button>
-            </form>
-          )
+          !!selectUserId && <FormSensMsg newMessageText={newMessageText} sendMessage={sendMessage} setNewMessageText={setNewMessageText} />
         }
-
       </section>
     </main>
   )
