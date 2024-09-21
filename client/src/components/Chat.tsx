@@ -9,6 +9,7 @@ import { WS_API } from '../utils/constans'
 import { Avatar } from './ui/Avatar'
 import { uniqBy } from 'lodash'
 import axios from 'axios'
+import { FormSensMsg } from './FormSensMsg'
 
 function Chat () {
   const [ws, setWs] = useState<WebSocket | null>(null)
@@ -62,6 +63,8 @@ function Chat () {
   }
 
   const handleMessages = (event: MessageEvent) => {
+    console.log(event.data);
+    
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
       showOnlineUsers(messageData.online)
@@ -200,16 +203,7 @@ function Chat () {
         </div>
 
         {
-          !!selectUserId && (
-            <form className='flex gap-2' onSubmit={sendMessage}>
-              <input type="text" placeholder='type your message here'
-                value={newMessageText} onChange={e => setNewMessageText(e.target.value)}
-                className="bg-white border flex-grow p-2 rounded-md" />
-              <button className="bg-blue-600 p-2 text-white rounded-md">
-                <SendIcon />
-              </button>
-            </form>
-          )
+          !!selectUserId && <FormSensMsg newMessageText={newMessageText} sendMessage={sendMessage} setNewMessageText={setNewMessageText} />
         }
 
       </section>
