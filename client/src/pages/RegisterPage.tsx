@@ -1,7 +1,8 @@
-import axios from "axios"
-import { useState } from "react"
-import { toast, Toaster } from "sonner"
-import { URL_API } from "../utils/constans"
+import { Link, useNavigate } from 'react-router-dom'
+import { URL_API } from '../utils/constans'
+import { toast, Toaster } from 'sonner'
+import { useState } from 'react'
+import axios from 'axios'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -9,6 +10,8 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+
+  const navigate = useNavigate()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -22,6 +25,9 @@ export default function RegisterPage() {
       .then(res => {
         if (res.status === 201) {
           toast.success('Usuario registrado', { description: 'Ahora puedes iniciar sesión' })
+          setTimeout(() => {
+            navigate('/')
+          }, 4000)
         }
         if (res.status === 400) {
           toast.error('Registro fallido', { description: 'Por favor, intenta de nuevo' })
@@ -32,7 +38,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <section className='w-screen h-screen flex items-center justify-center pb-12'>
+    <section className='w-screen h-screen flex flex-col items-center justify-center pb-12'>
       <form className='w-full px-64' onSubmit={handleSubmit}>
         <div className='relative z-0 w-full mb-5 group'>
           <input type='email' placeholder=' ' required value={email} onChange={e => setEmail(e.target.value)}
@@ -64,7 +70,11 @@ export default function RegisterPage() {
         <button type='submit' className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'>Register</button>
       </form>
 
-      <Toaster duration={4000} position="top-right" richColors />
+      <p className='text-center mt-5 text-sm text-gray-500 dark:text-gray-400'>
+        ya estás registrado? <Link to='/' className='px-2 hover:underline'>Inicia sesión</Link>
+      </p>
+
+      <Toaster duration={4000} position='top-right' richColors />
     </section>
   )
 }
