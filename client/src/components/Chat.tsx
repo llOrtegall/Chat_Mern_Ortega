@@ -136,7 +136,7 @@ function Chat() {
           <ul>MernChat</ul>
           <input type="checkbox" onChange={toggleDarkMode} />
         </nav>
-        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {username}</h2>
+        <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {email}</h2>
 
         <ContatsViews offlinePeople={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
 
