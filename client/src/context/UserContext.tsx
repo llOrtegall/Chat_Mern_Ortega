@@ -1,30 +1,33 @@
-import axios from 'axios'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
 interface UserContextType {
-  username: string
-  setUsername: (username: string) => void
+  email: string
+  setEmail: (email: string) => void
   id: string
   setId: (id: string) => void
+  isAuthenticated: boolean
+  setIsAuthenticated: (isAuthenticated: boolean) => void
 }
 
 export const UserContext = createContext<UserContextType | null>(null)
 
 export function UserContextProvider ({ children }: { children: ReactNode }) {
-  const [username, setUsername] = useState<string>('')
+  const [email, setEmail] = useState<string>('')
   const [id, setId] = useState<string>('')
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
 
   useEffect(() => {
     axios.get('/profile')
       .then(res => {
-        setUsername(res.data.username)
+        setEmail(res.data.email)
         setId(res.data.id)
       })
       .catch(err => console.error(err))
-  }, [username])
+  }, [isAuthenticated])
 
   return (
-    <UserContext.Provider value={{ username, setUsername, id, setId }}>
+    <UserContext.Provider value={{ email, setEmail, id, setId, isAuthenticated, setIsAuthenticated }}>
       {children}
     </UserContext.Provider>
   )

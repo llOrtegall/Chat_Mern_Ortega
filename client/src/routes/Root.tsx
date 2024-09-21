@@ -3,9 +3,9 @@ import LoginPage from '../pages/LoginPage'
 import { Outlet } from 'react-router-dom'
 
 export default function Root () {
-  const { id, username } = useUser()
+  const { id, email, } = useUser()
 
-  if (!id || !username) {
+  if (!id || !email) {
     return <LoginPage />
   }
 

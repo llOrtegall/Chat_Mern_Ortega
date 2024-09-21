@@ -26,16 +26,16 @@ export async function getUserDataFromRequest(req: Request): Promise<UserDataInt>
 }
 
 const loginUser = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const user = await UserModel.findOne({ username });
+    const user = await UserModel.findOne({ email });
     if (!user) return res.status(404).json('User not found');
 
     const passwordMatch = bcryp.compareSync(password, user.password);
     if (!passwordMatch) return res.status(401).json('Clave incorrecta');
 
-    jwt.sign({ userId: user._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
+    jwt.sign({ userId: user._id, email }, JWT_SECRET, {}, (err: any, token?: string) => {
       if (err) throw err;
       if (token) {
         res.cookie('token', token, { sameSite: 'lax', secure: false }).status(201).json({ id: user._id });
