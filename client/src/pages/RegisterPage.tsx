@@ -1,5 +1,7 @@
+import axios from "axios"
 import { useState } from "react"
 import { toast, Toaster } from "sonner"
+import { URL_API } from "../utils/constans"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -16,7 +18,17 @@ export default function RegisterPage() {
       return
     }
 
-    console.log(email, password, confirmPassword, firstName, lastName)
+    axios.post(`${URL_API}/register`, { email, password, names: firstName, lastnames: lastName })
+      .then(res => {
+        if (res.status === 201) {
+          toast.success('Usuario registrado', { description: 'Ahora puedes iniciar sesión' })
+        }
+        if (res.status === 400) {
+          toast.error('Registro fallido', { description: 'Por favor, intenta de nuevo' })
+          throw new Error('Registration failed')
+        }
+      })
+      .catch(err => console.error(err))
   }
 
   return (

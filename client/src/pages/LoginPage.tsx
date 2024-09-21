@@ -2,7 +2,7 @@ import { useUser } from '../context/UserContext'
 import { useState } from 'react'
 import axios from 'axios'
 
-function LoginAndRegisterForm () {
+function LoginPage () {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const { setUsername: setLoggedInUsername, setId } = useUser()
@@ -70,4 +70,4 @@ function LoginAndRegisterForm () {
   )
 }
 
-export default LoginAndRegisterForm
+export default LoginPage

@@ -52,24 +52,15 @@ const loginUser = async (req: Request, res: Response) => {
 
 const registerUser = async (req: Request, res: Response) => {
 
-  const { username, password } = req.body;
+  const { email, password, names, lastnames } = req.body;
 
   try {
     const hashedPassword = bcryp.hashSync(password, SALT);
 
-    const newUser = await UserModel.create({
-      username: username,
-      password: hashedPassword
-    });
+    const newUser = await UserModel.create({ email, names, lastnames, password: hashedPassword });
 
-    jwt.sign({ userId: newUser._id, username }, JWT_SECRET, {}, (err: any, token?: string) => {
-      if (err) throw err;
-      if (token) {
-        res.cookie('token', token, { sameSite: 'lax', secure: false }).status(201).json({ id: newUser._id });
-      } else {
-        res.status(500).json('Token generation failed');
-      }
-    });
+    return res.status(201).json({ message: 'User created', id: newUser._id });
+
   } catch (error) {
     console.log(error);
     return res.status(400).json(error);
@@ -88,7 +79,7 @@ const getProfile = async (req: Request, res: Response) => {
       const user = await UserModel.findById(decoded.userId);
       if (!user) return res.status(404).json('User not found');
 
-      return res.status(200).json({ id: user._id, username: user.username });
+      return res.status(200).json({ id: user._id, email: user.email });
     });
   } catch (error) {
     res.status(500).json(error);
@@ -103,9 +94,9 @@ const logoutProfile = async (req: Request, res: Response) => {
   }
 }
 
-const getUserDataUsers = async (req: Request, res: Response ) => {
-    try {
-    const users = await UserModel.find({}, {'_id': 1, username: 1 })
+const getUserDataUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await UserModel.find({}, { '_id': 1, username: 1 })
     return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json(error);
