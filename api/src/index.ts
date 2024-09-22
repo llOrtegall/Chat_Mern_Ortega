@@ -72,9 +72,9 @@ wss.on('connection', (socket: DataWss, req) => {
   }
 
   [...wss.clients].forEach((client: DataWss) => {
-    client.send(JSON.stringify(
-      [...wss.clients].map((client: DataWss) => ({ userId: client.userId, email: client.email}))
-    ))
+    client.send(JSON.stringify({ 
+      online: [...wss.clients].map((client: DataWss) => ({ userId: client.userId, email: client.email }))
+    }))
   } );
   
   
