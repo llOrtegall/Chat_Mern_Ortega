@@ -53,20 +53,10 @@ function Chat() {
     }
   }, [selectUserId])
 
-  const showOnlineUsers = (peopleArray: OnlineUser[]) => {
-    const people = {} as Record<string, OnlineUser>
-
-    peopleArray.forEach(({ userId, email }) => {
-      people[userId] = { userId, email }
-    })
-
-    setOnlinePeople(Object.values(people))
-  }
-
   const handleMessages = (event: MessageEvent) => {
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
-      showOnlineUsers(messageData.online)
+      setOnlinePeople(messageData.online)
     } else if (messageData.messages) {
       setMessages(prev => ([...prev, { ...messageData.messages }]))
     }
@@ -122,7 +112,7 @@ function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
 
-  const onlinePeopleWithoutMe = onlinePeople.filter(({ email: onlineemail }) => onlineemail !== email)
+  const onlinePeopleWithoutMe = onlinePeople.filter(p => p.userId !== id)
 
   const messagesWithOutDuplicates = uniqBy(messages, '_id')
 
