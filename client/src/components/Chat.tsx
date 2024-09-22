@@ -64,8 +64,6 @@ function Chat() {
   }
 
   const handleMessages = (event: MessageEvent) => {
-    console.log(event.data);
-
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
       showOnlineUsers(messageData.online)

@@ -1,6 +1,7 @@
 import { useUser } from '../context/UserContext'
 import LoginPage from '../pages/LoginPage'
-import Chat from '../components/Chat'
+// import Chat from '../components/Chat'
+import { ChatV2 } from '../components/ChatV2'
 
 export default function Root () {
   const { id, email, } = useUser()
@@ -9,5 +10,7 @@ export default function Root () {
     return <LoginPage />
   }
 
-  return <Chat />
+  return <ChatV2 />
+
+  // return <Chat />
 }

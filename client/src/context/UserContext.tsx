@@ -22,6 +22,7 @@ export function UserContextProvider ({ children }: { children: ReactNode }) {
       .then(res => {
         setEmail(res.data.email)
         setId(res.data.id)
+        setIsAuthenticated(true)
       })
       .catch(err => console.error(err))
   }, [isAuthenticated])
