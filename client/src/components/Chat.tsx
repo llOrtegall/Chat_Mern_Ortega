@@ -1,4 +1,4 @@
-import { MessageData, OfflineUser, OnlineUser, Messages } from '../types/type'
+import { MessageData, OnlineUser, Messages } from '../types/type'
 import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useEffect, useRef, useState } from 'react'
 import { useUser } from '../context/UserContext'
@@ -11,18 +11,22 @@ import { WS_API } from '../utils/constans'
 
 import { uniqBy } from 'lodash'
 import axios from 'axios'
+import { useOffUsers } from '../hooks/useOffUsers'
+import { useNavigate } from 'react-router-dom'
 
 function Chat() {
+  const { email, id, setId, setEmail } = useUser()
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Messages[]>([])
   const [newMessageText, setNewMessageText] = useState('')
-  const [offlinePeople, setOfflinePeople] = useState<OfflineUser[]>([])
+
+  const { offlinePeople } = useOffUsers({ id: id, onlinePeople })
+  const navigate = useNavigate()
 
   const divUnderMessage = useRef<HTMLDivElement>(null)
 
-  const { email, id, setId, setEmail } = useUser()
   const { toggleDarkMode } = useTheme()
 
   useEffect(() => {
@@ -84,7 +88,7 @@ function Chat() {
         }
       })
       .finally(() => {
-        window.location.href = '/'
+        navigate('/')
       })
   }
 
@@ -94,23 +98,6 @@ function Chat() {
       div?.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
   }, [messages])
-
-  async function getOnlinePeople(): Promise<OfflineUser[]> {
-    const response = await axios.get('/people')
-    return response.data
-  }
-
-  useEffect(() => {
-    getOnlinePeople()
-      .then(onlineP => {
-        const offlinePeople = onlineP.filter(p => p._id !== id).filter(p => !onlinePeople.find(op => op.userId === p._id))
-        setOfflinePeople(offlinePeople)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onlinePeople])
 
   const onlinePeopleWithoutMe = onlinePeople.filter(p => p.userId !== id)
 
@@ -126,7 +113,7 @@ function Chat() {
         </nav>
         <h2 className='text-center text-gray-800 font-bold pt-2 pb-4 dark:text-white'>Bienvenido: {email}</h2>
 
-        <ContatsViews offlinePeople={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
+        <ContatsViews offLineUsers={offlinePeople} onlinePeople={onlinePeopleWithoutMe} selectUserId={selectUserId} funSelectUserId={setSelectUserId}   />
 
         <div className='flex-grow'>
           <button onClick={handleLogout} className='bg-blue-500 text-white p-2 rounded-md w-full hover:bg-blue-700'>Logout</button>

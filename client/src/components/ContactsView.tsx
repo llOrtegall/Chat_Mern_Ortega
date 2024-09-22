@@ -3,12 +3,12 @@ import { Avatar } from './ui/Avatar'
 
 interface ShowMessagesProps {
   onlinePeople: OnlineUser[]
-  offlinePeople: OfflineUser[]
+  offLineUsers: OfflineUser[]
   funSelectUserId: (userId: string) => void
   selectUserId: string | null
 }
 
-export const ContatsViews = ({ offlinePeople, onlinePeople, funSelectUserId, selectUserId }: ShowMessagesProps) => {
+export const ContatsViews = ({ offLineUsers, onlinePeople, funSelectUserId, selectUserId }: ShowMessagesProps) => {
   return (
     <section className='h-full'>
       {
@@ -25,7 +25,7 @@ export const ContatsViews = ({ offlinePeople, onlinePeople, funSelectUserId, sel
         ))
       }
       {
-        offlinePeople.map(({ _id, email }) => (
+        offLineUsers.map(({ _id, email }) => (
           <section key={_id} onClick={() => funSelectUserId(_id)}>
             <section className={'p-2 border border-b-2 dark:bg-slate-600 border-gray-300 dark:border-gray-600 flex items-center gap-2 cursor-pointer rounded-md mb-1' +
               (_id === selectUserId ? 'bg-blue-200 dark:bg-blue-700' : '')}>
