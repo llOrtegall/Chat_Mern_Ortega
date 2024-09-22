@@ -8,17 +8,17 @@ import cors from 'cors';
 
 // TODO: Importar las variables de entorno  y types
 import { JWT_SECRET, ORIGIN_URL, PORT } from './config'
-// import { ExtendedWebSocket, MessageDataInt } from './types/types'
+import { ExtendedWebSocket, MessageDataInt } from './types/types'
 
 // TODO: Importar las rutas de la API
 import messageRouter from './routes/message.routes';
 import userRouter from './routes/user.routes';
 
 import { testDatabaseConnection } from './test/conectionDb';
-// import { MessageModel } from './model/Message.model';
-// import { clearInterval } from 'timers';
+import { MessageModel } from './model/Message.model';
+import { clearInterval } from 'timers';
 
-import WebSocket, { WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 
 
 const app = express();
@@ -51,36 +51,6 @@ const server = app.listen(PORT, () => {
 // TODO: Implementar el WebSocketServer para el chat
 const wss = new WebSocketServer({ server });
 
-interface DataWss extends WebSocket {
-  userId?: string;
-  email?: string;
-}
-
-wss.on('connection', (socket: DataWss, req) => {
-  const cookies = req.headers.cookie;
-
-  if(cookies){
-    const tokenCookieString = cookies.split(';')[0];
-    if(!tokenCookieString) return;
-    const token = tokenCookieString.split('=')[1];
-    jwt.verify(token, JWT_SECRET, {}, (err: any, decoded: any) => {
-      if (err) throw err;
-      const { userId, email } = decoded;
-      socket.userId = userId;
-      socket.email = email
-    });
-  }
-
-  [...wss.clients].forEach((client: DataWss) => {
-    client.send(JSON.stringify({ 
-      online: [...wss.clients].map((client: DataWss) => ({ userId: client.userId, email: client.email }))
-    }))
-  } );
-  
-  
-});
-
-/*
 wss.on('connection', (connection: ExtendedWebSocket, req) => {
 
   function notifyOnlineUsers() {
@@ -148,7 +118,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   notifyOnlineUsers();
 
 });
-*/
+
 
 testDatabaseConnection()
   .then(() => console.log('Database connection successful'))
