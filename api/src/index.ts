@@ -51,7 +51,7 @@ const server = app.listen(PORT, () => {
 // TODO: Implementar el WebSocketServer para el chat
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (connection: ExtendedWebSocket, req) => {
+wss.on('connection', (socket: ExtendedWebSocket, req) => {
 
   function notifyOnlineUsers() {
     [...wss.clients].forEach((client: ExtendedWebSocket) => {
@@ -61,20 +61,20 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
     });
   }
 
-  connection.isAlive = true;
+  socket.isAlive = true;
 
-  connection.timer = setInterval(() => {
-    connection.ping();
-    connection.deathTimer = setTimeout(() => {
-      connection.isAlive = false;
-      clearInterval(connection.timer);
-      connection.terminate();
+  socket.timer = setInterval(() => {
+    socket.ping();
+    socket.deathTimer = setTimeout(() => {
+      socket.isAlive = false;
+      clearInterval(socket.timer);
+      socket.terminate();
       notifyOnlineUsers();
     }, 2000);
   }, 10000);
 
-  connection.on('pong', () => {
-    clearInterval(connection.deathTimer);
+  socket.on('pong', () => {
+    clearInterval(socket.deathTimer);
   });
 
   // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y email
@@ -88,24 +88,24 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
         jwt.verify(token, JWT_SECRET, {}, async (err: any, decoded: any) => {
           if (err) throw err;
           const { userId, email } = decoded;
-          connection.userId = userId;
-          connection.email = email;
+          socket.userId = userId;
+          socket.email = email;
         });
       }
     }
   }
 
-  connection.on('message', async (message: string) => {
+  socket.on('message', async (message: string) => {
     const messageData: MessageDataInt = JSON.parse(message)
     const { recipient, text } = messageData;
 
     if (recipient && text) {
-      const newMessageDoc = await MessageModel.create({ sender: connection.userId, recipient, text });
+      const newMessageDoc = await MessageModel.create({ sender: socket.userId, recipient, text });
       [...wss.clients]
         .filter((client: ExtendedWebSocket) => client.userId === recipient)
         .forEach((client: ExtendedWebSocket) => {
           client.send(JSON.stringify({
-            messages: { text, sender: connection.userId, recipient, _id: newMessageDoc._id }
+            messages: { text, sender: socket.userId, recipient, _id: newMessageDoc._id }
           }));
         })
     }
@@ -115,8 +115,3 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
   notifyOnlineUsers();
 
 });
-
-
-testDatabaseConnection()
-  .then(() => console.log('Database connection successful'))
-  .catch((error) => console.error('Error connecting to database', error));
