@@ -115,3 +115,10 @@ wss.on('connection', (socket: ExtendedWebSocket, req) => {
   notifyOnlineUsers();
 
 });
+
+testDatabaseConnection()
+  .then(() => {})
+  .catch((error) => {
+    console.error('Error connecting to MongoDB', error);
+    process.exit(1);
+  });
