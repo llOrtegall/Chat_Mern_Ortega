@@ -8,9 +8,14 @@ export interface OfflineUser {
   email: string;
 }
 
+export interface Messages {
+  text: string;
+  sender: string;
+  recipient: string;
+  id: string;
+}
+
 export interface MessageData {
   online: OnlineUser[];
-  text?: string[];
-  isOur?: boolean;
-  sender?: string;
+  messages: Messages;
 }

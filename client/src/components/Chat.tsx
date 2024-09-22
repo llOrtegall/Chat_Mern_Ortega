@@ -1,4 +1,4 @@
-import { MessageData, OfflineUser, OnlineUser } from '../types/type'
+import { MessageData, OfflineUser, OnlineUser, Messages } from '../types/type'
 import { ArrowIconLeft } from './icons/ArrowIconLeft'
 import { useEffect, useRef, useState } from 'react'
 import { useUser } from '../context/UserContext'
@@ -16,7 +16,7 @@ function Chat() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlineUser[]>([])
   const [selectUserId, setSelectUserId] = useState<string | null>(null)
-  const [messages, setMessages] = useState<MessageData[]>([])
+  const [messages, setMessages] = useState<Messages[]>([])
   const [newMessageText, setNewMessageText] = useState('')
   const [offlinePeople, setOfflinePeople] = useState<OfflineUser[]>([])
 
@@ -67,8 +67,8 @@ function Chat() {
     const messageData: MessageData = JSON.parse(event.data)
     if (messageData.online) {
       showOnlineUsers(messageData.online)
-    } else if (messageData.text) {
-      setMessages(prev => ([...prev, { ...messageData }]))
+    } else if (messageData.messages) {
+      setMessages(prev => ([...prev, { ...messageData.messages }]))
     }
   }
 
@@ -81,7 +81,7 @@ function Chat() {
       }
     ))
     setNewMessageText('')
-    setMessages(pre => ([...pre, { text: [newMessageText], online: [], sender: id, recipient: selectUserId, _id: Date.now() }]))
+    setMessages(pre => ([...pre, { text: newMessageText, sender: id, recipient: selectUserId!, id: Math.random().toString() }]))
   }
 
   const handleLogout = () => {

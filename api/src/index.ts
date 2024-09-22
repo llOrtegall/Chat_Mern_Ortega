@@ -79,7 +79,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
 
   // TODO: esto es para verificar si el usuario está autenticado y obtener su userId y email
   const cookies = req.headers.cookie;
-  
+
   if (cookies) {
     const tokenCookieString = cookies.split(';').find((cookie: string) => cookie.includes('token'));
     if (tokenCookieString) {
@@ -105,10 +105,7 @@ wss.on('connection', (connection: ExtendedWebSocket, req) => {
         .filter((client: ExtendedWebSocket) => client.userId === recipient)
         .forEach((client: ExtendedWebSocket) => {
           client.send(JSON.stringify({
-            text,
-            sender: connection.userId,
-            recipient,
-            _id: newMessageDoc._id
+            messages: { text, sender: connection.userId, recipient, _id: newMessageDoc._id }
           }));
         })
     }

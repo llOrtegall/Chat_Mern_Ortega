@@ -1,7 +1,7 @@
-import { MessageData } from "../types/type"
+import { Messages } from "../types/type"
 
 interface ShowMessagesProps {
-  messages: MessageData[]
+  messages: Messages[]
   id: string
   refScroll: React.RefObject<HTMLDivElement>
 }
