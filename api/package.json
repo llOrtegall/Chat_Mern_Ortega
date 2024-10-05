@@ -4,32 +4,30 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "nodemon",
-    "build": "tsc -p ."
+    "start": "node --env-file=.env dist/index.js",
+    "dev": "tsx --env-file=.env ./src/index.ts",
+    "build": "tsc"
   },
   "dependencies": {
-    "@types/ws": "^8.5.12",
     "bcryptjs": "2.4.3",
-    "cookie-parser": "1.4.6",
+    "cookie-parser": "^1.0.0",
     "cors": "2.8.5",
-    "dotenv": "16.4.5",
-    "express": "4.19.2",
+    "express": "^4.21.0",
     "jsonwebtoken": "9.0.2",
     "mongoose": "8.5.2",
-    "ws": "^8.18.0"
+    "ws": "8.18.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
+    "@types/bcryptjs": "2.4.6",
     "@types/cookie-parser": "1.4.7",
     "@types/cors": "2.8.17",
     "@types/express": "4.17.21",
     "@types/jsonwebtoken": "9.0.6",
-    "@types/morgan": "^1.9.9",
+    "@types/morgan": "1.9.9",
     "@types/node": "22.0.2",
-    "morgan": "^1.10.0",
-    "nodemon": "3.1.4",
-    "ts-node": "10.9.2",
+    "@types/ws": "8.5.12",
+    "morgan": "1.10.0",
+    "tsx": "4.19.1",
     "typescript": "5.5.4"
   }
 }

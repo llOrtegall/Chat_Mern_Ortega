@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 export const PORT: number = parseInt(process.env.PORT ?? '3001');
 export const JWT_SECRET: string = process.env.JWT_SECRET || '';
 export const ORIGIN_URL: string = process.env.ORIGIN_URL || '';
