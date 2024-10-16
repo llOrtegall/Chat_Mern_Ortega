@@ -61,6 +61,7 @@ wss.on('connection', (conn: CustomWebSocket, req) => {
             c.send(JSON.stringify({ 
               text,
               sender: conn.id,
+              recipient: recipient,
               id: messageDoc.id
              }))
           })

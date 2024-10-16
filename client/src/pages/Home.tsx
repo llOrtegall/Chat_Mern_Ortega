@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-import Avatar from "../components/Avatar";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from '../auth/AuthProvider';
+import { useEffect, useState } from 'react'
+import Avatar from '../components/Avatar';
 
 const URL_WS = import.meta.env.VITE_URL_WS!;
 
@@ -28,11 +28,9 @@ export default function Home() {
   const handleMessage = (ev: MessageEvent) => {
     const messageData = JSON.parse(ev.data)
 
-    console.log(messageData);
-
     if ('online' in messageData) {
       showOnlineUsers(messageData.online)
-    } else {
+    } else if ('text' in messageData) {
       setMessages(prev => ([...prev, messageData.text]))
     }
   }
@@ -67,7 +65,7 @@ export default function Home() {
                   <div key={user.id} onClick={() => setSelectedUser(user.id)}
                     className={`px-2 hover:bg-yellow-200 border-b border-gray-300 flex items-center gap-2 py-1 cursor-pointer ${user.id === selectedUser ? 'bg-blue-200' : ''}`}>
                     {selectedUser === user.id && (
-                      <div className="w-1 bg-blue-500 h-10 rounded-md">
+                      <div className='w-1 bg-blue-500 h-10 rounded-md'>
 
                       </div>
                     )}
@@ -95,8 +93,8 @@ export default function Home() {
           {
             !!selectedUser && (
               <section>
-                {messages.map((msg, index) => (
-                  <div key={index}>{msg}</div>
+                {messages.map((msg) => (
+                  <div key={msg}>{msg}</div>
                 ))}
               </section>
             )
@@ -105,9 +103,9 @@ export default function Home() {
         {
           !!selectedUser && (
             <form className='flex gap-2 py-2 w-full' onSubmit={sendMessage}>
-              <input type="text" value={newMsg} onChange={e => setNewMsg(e.target.value)}
-                className="w-full p-2 rounded-md" />
-              <button type='submit' className="w-24 bg-blue-500 px-4 py-2 rounded-md">
+              <input type='text' value={newMsg} onChange={e => setNewMsg(e.target.value)}
+                className='w-full p-2 rounded-md' />
+              <button type='submit' className='w-24 bg-blue-500 px-4 py-2 rounded-md'>
                 Send
               </button>
             </form>
