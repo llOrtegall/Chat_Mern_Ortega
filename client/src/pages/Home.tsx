@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 
 const URL_WS = import.meta.env.VITE_URL_WS!;
 
-function App() {
+export default function Home() {
   const [ws, setWs] = useState<WebSocket | null>(null)
 
   useEffect(() => {
@@ -19,9 +19,7 @@ function App() {
 
   return (
     <section className="px-2 py-1">
-      <h1>App</h1>
+      <h1>Home</h1>
     </section>
   )
 }
-
-export default App

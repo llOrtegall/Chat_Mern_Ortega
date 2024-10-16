@@ -23,6 +23,7 @@ export const createdUser = async (req: Request, res: Response) => {
   const hasPassword = bycrypt.hashSync(result.data.password, SALT);
 
   try {
+    await User.sync();
     const user = await User.create({
       names: result.data.names,
       lastNames: result.data.lastNames,
@@ -39,6 +40,8 @@ export const createdUser = async (req: Request, res: Response) => {
       res.status(400).json({ error: 'Email already exists' });
       return;
     }
+
+    console.log(e);
 
     res.status(500).json({ message: 'Internal server error' });
     return;
