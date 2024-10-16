@@ -13,11 +13,13 @@
   "description": "",
   "dependencies": {
     "express": "4.21.1",
-    "mysql2": "^3.11.3",
-    "sequelize": "^6.37.4",
-    "ws": "8.18.0"
+    "mysql2": "3.11.3",
+    "sequelize": "6.37.4",
+    "ws": "8.18.0",
+    "zod": "3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "9.0.3",
     "@types/express": "5.0.0",
     "@types/node": "22.7.5",
     "@types/ws": "8.5.12",
