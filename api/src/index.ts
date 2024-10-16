@@ -25,12 +25,12 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocketServer({ server });
 
-interface CustonWebSocket extends WebSocket {
+interface CustomWebSocket extends WebSocket {
   id?: string;
   email?: string;
 }
 
-wss.on('connection', (conn: CustonWebSocket, req) => {
+wss.on('connection', (conn: CustomWebSocket, req) => {
 
   const token = req.headers.cookie?.split('=')[1];
   
@@ -42,9 +42,10 @@ wss.on('connection', (conn: CustonWebSocket, req) => {
     });
   }
 
-  [...wss.clients].map((c:CustonWebSocket) => {
-    console.log(c.id);
-  });
-  
+  [...wss.clients].forEach( (c: CustomWebSocket) => {
+    c.send(JSON.stringify({
+      online: [...wss.clients].map( (c: CustomWebSocket) => ({ id: c.id, email: c.email }))
+    }));
+  })
   
 });
