@@ -20,3 +20,5 @@ User.init({
   modelName: 'User',
   timestamps: true
 })
+
+export { User };
