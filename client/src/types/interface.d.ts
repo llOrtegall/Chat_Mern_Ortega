@@ -4,3 +4,8 @@ export interface User {
   names: string
   lastNames: string
 }
+
+export interface LoginResponse {
+  message: string
+  userData: User
+}

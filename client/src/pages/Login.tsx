@@ -2,6 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import { useAuth } from "../auth/AuthProvider";
 import { toast, Toaster } from "sonner";
+import { LoginResponse } from "../types/interface";
 
 const URL_LOGIN = import.meta.env.VITE_URL_LOGIN!;
 
@@ -18,10 +19,12 @@ export default function Login() {
   const handleLogin = async (ev: React.FormEvent) => {
     ev.preventDefault();
 
-    axios.post(`${URL_LOGIN}/login`, { email, password })
+    axios.post<LoginResponse>(`${URL_LOGIN}/login`, { email, password })
       .then(response => {
         console.log(response.data);
-        login(response.data);
+        if (response.status === 200) {
+          login(response.data.userData)
+        }
       })
       .catch(err => {
         console.log(err);

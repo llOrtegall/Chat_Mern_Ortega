@@ -71,11 +71,11 @@ export const getUserByEmail = async (req: Request, res: Response) => {
       return;
     }
 
-    const { id, names } = user.dataValues;
+    const { id, names, email, lastNames } = user.dataValues;
 
-    jwt.sign({ id, names }, SECRET, { expiresIn: '2h' }, (err, token) => {
+    jwt.sign({ id, names, email, lastNames }, SECRET, { expiresIn: '2h' }, (err, token) => {
       if (err) throw err;
-      res.cookie('token', token, { httpOnly: true }).status(200).json({ message: 'Login successful', userId: id });
+      res.cookie('token', token, { httpOnly: true }).status(200).json({ message: 'Login successful', userData: { id, names, email, lastNames } });
       return;
     })
 
