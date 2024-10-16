@@ -3,6 +3,8 @@ export interface User {
   email: string
   names: string
   lastNames: string
+  iat?: number
+  exp?: number
 }
 
 export interface LoginResponse {

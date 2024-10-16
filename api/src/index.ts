@@ -1,12 +1,14 @@
 import { UserRouter } from './routes/user.routes';
 import cookieParser from 'cookie-parser';
-import { WebSocketServer } from 'ws';
+import WebSocket, { WebSocketServer } from 'ws';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT!;
 const ulrOrigin = process.env.ORIGIN_URL!;
+const SECRET = process.env.JWT_SECRET!;
 
 app.use(express.json());
 app.use(cookieParser());
@@ -23,12 +25,26 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (conn, req) => {
+interface CustonWebSocket extends WebSocket {
+  id?: string;
+  email?: string;
+}
 
-  conn.send('Hello from server');
+wss.on('connection', (conn: CustonWebSocket, req) => {
 
-  conn.on('message', (message) => {
-    console.log(message);
-    
+  const token = req.headers.cookie?.split('=')[1];
+  
+  if(token){
+    jwt.verify(token, SECRET, (err: any, decoded: any) => {
+      if(err) throw err;
+      conn.id = decoded.id;
+      conn.email = decoded.email;
+    });
+  }
+
+  [...wss.clients].map((c:CustonWebSocket) => {
+    console.log(c.id);
   });
+  
+  
 });

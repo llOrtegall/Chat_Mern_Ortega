@@ -21,7 +21,6 @@ export default function Login() {
 
     axios.post<LoginResponse>(`${URL_LOGIN}/login`, { email, password })
       .then(response => {
-        console.log(response.data);
         if (response.status === 200) {
           login(response.data.userData)
         }
