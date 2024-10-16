@@ -1,10 +1,9 @@
 function App() {
 
   return (
-    <>
-      <h1>React App</h1>
-      <p>React App with TypeScript and Tailwind CSS</p>
-    </>
+    <section className="px-2 py-1">
+      <h1>App</h1>
+    </section>
   )
 }
 
