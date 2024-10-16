@@ -14,9 +14,12 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (ws) => {
-  ws.on('message', (message) => {
-    console.log(`Received message => ${message}`);
-    ws.send(`You sent => ${message}`);
+wss.on('connection', (conn, req) => {
+
+  conn.send('Hello from server');
+
+  conn.on('message', (message) => {
+    console.log(message);
+    
   });
 });
