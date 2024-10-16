@@ -1,6 +1,7 @@
 import { UserRouter } from './routes/user.routes';
-import cookieParser from 'cookie-parser';
 import WebSocket, { WebSocketServer } from 'ws';
+import { Message } from './models/messages.model';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
@@ -33,19 +34,45 @@ interface CustomWebSocket extends WebSocket {
 wss.on('connection', (conn: CustomWebSocket, req) => {
 
   const token = req.headers.cookie?.split('=')[1];
-  
-  if(token){
+
+  if (token) {
     jwt.verify(token, SECRET, (err: any, decoded: any) => {
-      if(err) throw err;
+      if (err) throw err;
       conn.id = decoded.id;
       conn.email = decoded.email;
     });
   }
 
-  [...wss.clients].forEach( (c: CustomWebSocket) => {
+  conn.on('message', async (msg) => {
+    const { message } = JSON.parse(msg.toString());
+    
+    if (message) {
+      const { recipient, text } = message as { recipient: string, text: string };
+
+      await Message.sync();
+      const messageDoc = await Message.create({ sender: conn.id!, recipient: recipient, text: text })
+
+      if (recipient && text) {
+        
+
+        [...wss.clients]
+          .filter((c: CustomWebSocket) => c.id === recipient)
+          .forEach((c: CustomWebSocket) => {
+            c.send(JSON.stringify({ 
+              text,
+              sender: conn.id,
+              id: messageDoc.id
+             }))
+          })
+      }
+    }
+
+  });
+
+  [...wss.clients].forEach((c: CustomWebSocket) => {
     c.send(JSON.stringify({
-      online: [...wss.clients].map( (c: CustomWebSocket) => ({ id: c.id, email: c.email }))
+      online: [...wss.clients].map((c: CustomWebSocket) => ({ id: c.id, email: c.email }))
     }));
   })
-  
+
 });
