@@ -81,3 +81,24 @@ export const getUserByEmail = async (req: Request, res: Response) => {
     return;
   }
 }
+
+export const verifyUser = async (req: Request, res: Response) => {
+  const token = req.cookies?.token;
+  
+  if (token) {
+    jwt.verify(token, SECRET, (err: any, decoded: any) => {
+      if (err) {
+        res.status(401).json({ message: 'Unauthorized' });
+        return;
+      }
+
+      res.status(200).json(decoded);
+      return;
+    });
+  } else {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+
+}
