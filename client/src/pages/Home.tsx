@@ -1,8 +1,7 @@
 import { useAuth } from '../auth/AuthProvider';
-import { useEffect, useState } from 'react'
+import { URL_WS } from '../utils/constanst';
+import { useEffect, useState } from 'react';
 import Avatar from '../components/Avatar';
-
-const URL_WS = import.meta.env.VITE_URL_WS!;
 
 interface UsersOnline {
   id: string;
@@ -99,17 +98,21 @@ export default function Home() {
           }
           {
             !!selectedUser && (
-              <section>
+              <div className='relative h-full'>
+              <section className='overflow-y-scroll absolute inset-0'>
                 {
                   messages.map((msg, index) => (
-                    <div key={index} className={`flex gap-2 ${msg.userId === user?.id ? 'justify-end' : 'justify-start'}`}>
+                    <div key={index} className={`flex mb-1 gap-2 ${msg.userId === user?.id ? 'justify-end' : 'justify-start'}`}>
                       <div className={`p-2 rounded-md ${msg.userId === user?.id ? 'bg-blue-500 text-white' : 'bg-white'}`}>
-                        {msg.text}
+                        {msg.text} <br />
+                        {user?.id}<br />
+                        {msg.userId}
                       </div>
                     </div>
                   ))
                 }
               </section>
+              </div>
             )
           }
         </div>
