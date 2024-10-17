@@ -9,11 +9,16 @@ interface UsersOnline {
   email: string;
 }
 
+interface Messages {
+  userId: string;
+  text: string;
+}
+
 export default function Home() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [peopleOnline, setPeopleOnline] = useState<UsersOnline[]>([])
   const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined)
-  const [messages, setMessages] = useState<string[]>([])
+  const [messages, setMessages] = useState<Messages[]>([])
   const [newMsg, setNewMsg] = useState<string>('')
   const { user } = useAuth()
 
@@ -30,8 +35,10 @@ export default function Home() {
 
     if ('online' in messageData) {
       showOnlineUsers(messageData.online)
-    } else if ('text' in messageData) {
-      setMessages(prev => ([...prev, messageData.text]))
+    } else if ('message' in messageData) {
+      console.log(messageData);
+      const { sender, text } = messageData.message as { id: string, recipient: string, sender: string, text: string }
+      setMessages(prev => [...prev, { userId: sender, text }])
     }
   }
 
@@ -49,7 +56,7 @@ export default function Home() {
       }
     }))
     setNewMsg('')
-    setMessages(prev => ([...prev, newMsg]))
+    setMessages(prev => [...prev, { userId: user!.id, text: newMsg }])
   }
 
   const onlineUserExcludeMe = peopleOnline.filter(p => p.id !== user?.id)
@@ -93,9 +100,15 @@ export default function Home() {
           {
             !!selectedUser && (
               <section>
-                {messages.map((msg) => (
-                  <div key={msg}>{msg}</div>
-                ))}
+                {
+                  messages.map((msg, index) => (
+                    <div key={index} className={`flex gap-2 ${msg.userId === user?.id ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`p-2 rounded-md ${msg.userId === user?.id ? 'bg-blue-500 text-white' : 'bg-white'}`}>
+                        {msg.text}
+                      </div>
+                    </div>
+                  ))
+                }
               </section>
             )
           }

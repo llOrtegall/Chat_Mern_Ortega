@@ -44,26 +44,28 @@ wss.on('connection', (conn: CustomWebSocket, req) => {
   }
 
   conn.on('message', async (msg) => {
+    console.log(msg.toString());
+
     const { message } = JSON.parse(msg.toString());
-    
+
     if (message) {
-      const { recipient, text } = message as { recipient: string, text: string };
+      const { recipient, text } = message as { recipient: string, text: string, sender: string };
 
       await Message.sync();
       const messageDoc = await Message.create({ sender: conn.id!, recipient: recipient, text: text })
 
       if (recipient && text) {
-        
-
         [...wss.clients]
           .filter((c: CustomWebSocket) => c.id === recipient)
           .forEach((c: CustomWebSocket) => {
-            c.send(JSON.stringify({ 
-              text,
-              sender: conn.id,
-              recipient: recipient,
-              id: messageDoc.id
-             }))
+            c.send(JSON.stringify({
+              message: {
+                text,
+                sender: conn.id,
+                recipient: recipient,
+                id: messageDoc.id
+              }
+            }))
           })
       }
     }
