@@ -1,8 +1,9 @@
-import { validateUser } from './Schemas/User.schemas';
 import { hashSync, genSaltSync, compareSync } from 'bcryptjs';
+import { validateUser } from './Schemas/User.schemas';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { UserModel } from './models/User';
+import ws, { WebSocket } from 'ws';
 import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
 import express from 'express';
 import cors from 'cors';
 
@@ -25,7 +26,7 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/profile', async (req, res) => {
-  
+
   try {
     const token = req.headers.cookie?.split('=')[1];
 
@@ -111,6 +112,46 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+interface CustomWebSocket extends WebSocket {
+  userId?: string;
+  username?: string;
+}
+
+interface TokenPayload extends JwtPayload {
+  userId: string;
+  username: string;
+}
+
+const wss = new ws.WebSocketServer({ server });
+
+wss.on('connection', (socket: CustomWebSocket, request) => {
+  const cookies = request.headers.cookie;
+
+  if (cookies) {
+    const tokenStr = cookies.split('=')[1];
+    if (tokenStr) {
+      jwt.verify(tokenStr, JWT_SECRET, {}, (err, decoded) => {
+        if (err) {
+          socket.close(1008, 'Unauthorized');
+          return;
+        }
+        const payload = decoded as TokenPayload;
+
+        socket.userId = payload.userId;
+        socket.username = payload.username;
+
+      });
+    }
+  }
+
+  [...wss.clients].forEach( (c: CustomWebSocket) => {
+    c.send(JSON.stringify({
+      online: [...wss.clients].map( (c: CustomWebSocket) => ({ userId: c.userId, username: c.username }))
+    }))
+  });
+})
+

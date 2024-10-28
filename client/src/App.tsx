@@ -1,4 +1,5 @@
 import { useUserContext } from './context/UserContext'
+import ChatPage from './pages/ChatPage'
 import Register from './pages/Register'
 import axios from 'axios'
 
@@ -9,11 +10,7 @@ function App() {
   const { username, id } = useUserContext()
 
   if (username && id) {
-    return (
-      <div>
-        <h1>Welcome {username}</h1>
-      </div>
-    )
+    return <ChatPage />
   }
 
   return (
