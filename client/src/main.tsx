@@ -1,14 +1,10 @@
-import { AuthProvider } from './auth/AuthProvider'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Routes } from './routes'
-
 import './index.css'
-import axios from 'axios'
-
-axios.defaults.withCredentials = true;
+import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <AuthProvider>
-    <Routes />
-  </AuthProvider>
+  <StrictMode>
+    <App />
+  </StrictMode>,
 )
