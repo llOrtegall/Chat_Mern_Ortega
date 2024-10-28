@@ -9,7 +9,11 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-
+    axios.post('/register', { username, email, password })
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => console.log(err))
   }
 
   return (
