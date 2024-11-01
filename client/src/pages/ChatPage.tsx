@@ -7,8 +7,15 @@ interface OnlinePeople {
   username: string;
 }
 
+interface Messages {
+  id: string;
+  sender: string;
+  text: string;
+}
+
 interface DataMessage extends MessageEvent {
   online: OnlinePeople[];
+  mgsSend: Messages;
 }
 
 export default function ChatPage() {
@@ -31,8 +38,9 @@ export default function ChatPage() {
     const msgData = JSON.parse(event.data) as DataMessage
     if (msgData.online) {
       showOnlinePeople(msgData.online)
-    } else {
-      console.log(msgData);
+    } else if (msgData.mgsSend) {
+      const { text } = msgData.mgsSend
+      setMessages(prev => [...prev, text])
     }
   }
 

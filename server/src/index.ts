@@ -151,7 +151,7 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
 
   socket.on('message', async (msg) => {
     const message = JSON.parse(msg.toString());
-    if(message.recipient && message.text){
+    if (message.recipient && message.text) {
       const msgDoc = await MessageModel.create({
         sender: socket.userId,
         recipient: message.recipient,
@@ -162,9 +162,11 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
         .filter((c: CustomWebSocket) => c.userId === message.recipient)
         .forEach((c: CustomWebSocket) => {
           c.send(JSON.stringify({
-            sender: socket.userId,
-            text: message.text,
-            id: msgDoc._id
+            mgsSend: {
+              sender: socket.userId,
+              text: message.text,
+              id: msgDoc._id
+            }
           }))
         });
     }
