@@ -3,26 +3,27 @@ import { useUserContext } from '../context/UserContext';
 import Avatar from '../components/Avatar';
 
 interface OnlinePeople {
-  userId: string;
-  username: string;
+  userId: string
+  username: string
 }
 
 interface Messages {
-  id: string;
-  sender: string;
-  text: string;
+  id: string
+  recipient: string
+  sender: string
+  text: string
 }
 
 interface DataMessage extends MessageEvent {
-  online: OnlinePeople[];
-  mgsSend: Messages;
+  online: OnlinePeople[]
+  mgsSend: Messages
 }
 
 export default function ChatPage() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlinePeople[]>([])
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
-  const [messages, setMessages] = useState<string[]>([])
+  const [messages, setMessages] = useState<Messages[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
   const { id } = useUserContext()
 
@@ -39,8 +40,13 @@ export default function ChatPage() {
     if (msgData.online) {
       showOnlinePeople(msgData.online)
     } else if (msgData.mgsSend) {
-      const { text } = msgData.mgsSend
-      setMessages(prev => [...prev, text])
+      const { sender, recipient, text, id } = msgData.mgsSend
+      setMessages(prev => [...prev, {
+        id,
+        recipient,
+        sender,
+        text,
+      }])
     }
   }
 
@@ -58,7 +64,12 @@ export default function ChatPage() {
     }))
 
     setNewMsgText('')
-    setMessages(prev => [...prev, newMsgText])
+    setMessages(prev => [...prev, {
+      id: new Date().toISOString(),
+      recipient: selectedPerson!,
+      sender: id,
+      text: newMsgText,
+    }])
   }
 
   return (
@@ -101,10 +112,10 @@ export default function ChatPage() {
             !!selectedPerson && (
               <div className='flex flex-col gap-2 p-2'>
                 {
-                  messages.map((msg, idx) => (
-                    <div key={idx} className='flex justify-end'>
-                      <div className='bg-white p-2 rounded-md'>
-                        <p>{msg}</p>
+                  messages.map((msg) => (
+                    <div key={msg.id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
+                      <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
+                        {msg.text}
                       </div>
                     </div>
                   ))

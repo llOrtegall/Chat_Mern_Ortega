@@ -164,6 +164,7 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
           c.send(JSON.stringify({
             mgsSend: {
               sender: socket.userId,
+              recipient: message.recipient,
               text: message.text,
               id: msgDoc._id
             }
