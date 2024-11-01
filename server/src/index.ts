@@ -148,9 +148,11 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     }
   }
 
-  [...wss.clients].forEach( (c: CustomWebSocket) => {
+  [...wss.clients].forEach((c: CustomWebSocket) => {
     c.send(JSON.stringify({
-      online: [...wss.clients].map( (c: CustomWebSocket) => ({ userId: c.userId, username: c.username }))
+      online: [...wss.clients].map((c: CustomWebSocket) => ({
+        userId: c.userId, username: c.username
+      }))
     }))
   });
 })
