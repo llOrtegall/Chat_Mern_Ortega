@@ -1,5 +1,6 @@
 import { hashSync, genSaltSync, compareSync } from 'bcryptjs';
 import { validateUser } from './Schemas/User.schemas';
+import { MessageModel } from './models/Messages';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { UserModel } from './models/User';
 import ws, { WebSocket } from 'ws';
@@ -148,15 +149,22 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     }
   }
 
-  socket.on('message', (msg) => {
+  socket.on('message', async (msg) => {
     const message = JSON.parse(msg.toString());
     if(message.recipient && message.text){
+      const msgDoc = await MessageModel.create({
+        sender: socket.userId,
+        recipient: message.recipient,
+        text: message.text
+      });
+
       [...wss.clients]
         .filter((c: CustomWebSocket) => c.userId === message.recipient)
         .forEach((c: CustomWebSocket) => {
           c.send(JSON.stringify({
             sender: socket.userId,
-            text: message.text
+            text: message.text,
+            id: msgDoc._id
           }))
         });
     }

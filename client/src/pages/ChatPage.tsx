@@ -89,6 +89,21 @@ export default function ChatPage() {
               </div>
             )
           }
+          {
+            !!selectedPerson && (
+              <div className='flex flex-col gap-2 p-2'>
+                {
+                  messages.map((msg, idx) => (
+                    <div key={idx} className='flex justify-end'>
+                      <div className='bg-white p-2 rounded-md'>
+                        <p>{msg}</p>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            )
+          }
         </div>
         {
           !!selectedPerson && (
