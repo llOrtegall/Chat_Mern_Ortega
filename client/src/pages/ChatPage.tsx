@@ -3,6 +3,11 @@ import { useUserContext } from '../context/UserContext';
 import Avatar from '../components/Avatar';
 import axios from 'axios';
 
+interface PeopleDB {
+  _id: string
+  username: string
+}
+
 interface OnlinePeople {
   userId: string
   username: string
@@ -89,6 +94,18 @@ export default function ChatPage() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
+
+  useEffect(() => {
+    axios.get<PeopleDB[]>('/people')
+      .then(res => {
+        const offlinePeople = res.data
+          .filter(p => p._id !== id)
+          .filter(p => !onlinePeople.find(op => op.userId === p._id))
+
+        console.log(offlinePeople);
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onlinePeople])
 
   useEffect(() => {
     if(selectedPerson){
