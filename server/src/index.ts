@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { UserModel } from './models/User';
 import ws, { WebSocket } from 'ws';
 import mongoose from 'mongoose';
-import express from 'express';
+import express, { Request } from 'express';
 import cors from 'cors';
 
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
@@ -22,8 +22,35 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true, }));
 
+async function getUserByToken(req: Request) {
+  const token = req.headers.cookie?.split('=')[1];
+  if (!token) return null;
+  return jwt.verify(token, JWT_SECRET, {}) as TokenPayload; 
+}
+
 app.get('/test', (req, res) => {
   res.send('Hello World this is a test');
+});
+
+app.get('/messages/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const userData = await getUserByToken(req);
+
+  if (!userData) {
+    res.status(401).json('Unauthorized');
+    return;
+  }
+
+  try {
+    const messages = await MessageModel.find({
+      sender: { $in: [userId, userData.userId] },
+      recipient : { $in: [userId, userData.userId] }
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json('An error occurred');
+  }
 });
 
 app.get('/profile', async (req, res) => {
