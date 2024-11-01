@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useUserContext } from '../context/UserContext';
 import Avatar from '../components/Avatar';
 
@@ -25,6 +25,8 @@ export default function ChatPage() {
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [messages, setMessages] = useState<Messages[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
   const { id } = useUserContext()
 
   useEffect(() => {
@@ -69,8 +71,14 @@ export default function ChatPage() {
       recipient: selectedPerson!,
       sender: id,
       text: newMsgText,
-    }])
+    }]);
   }
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages])
 
   return (
     <section className='h-screen flex'>
@@ -100,26 +108,29 @@ export default function ChatPage() {
 
       </section>
       <main className='bg-blue-300 flex flex-col w-2/3'>
-        <div className='flex-grow'>
+        <div className='flex-grow overflow-y-auto'>
           {
             !selectedPerson && (
-              <div className='h-full flex items-center justify-center'>
-                <p className='text-2xl text-blue-700'>Select a person to chat with</p>
+              <div className='flex items-center justify-center h-full'>
+                <p className='text-2xl text-blue-700 font-bold'>Select a person to chat with</p>
               </div>
             )
           }
           {
             !!selectedPerson && (
-              <div className='flex flex-col gap-2 p-2'>
-                {
-                  messages.map((msg) => (
-                    <div key={msg.id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
-                      <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
-                        {msg.text}
+              <div className='mb-4 h-full'>
+                <div className='flex flex-col gap-2 p-2 pb-2'>
+                  {
+                    messages.map((msg) => (
+                      <div key={msg.id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
+                        <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
+                          {msg.text}
+                        </div>
                       </div>
-                    </div>
-                  ))
-                }
+                    ))
+                  }
+                  <div ref={messagesEndRef}></div>
+                </div>
               </div>
             )
           }
