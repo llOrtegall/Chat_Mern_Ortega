@@ -130,7 +130,7 @@ const wss = new ws.WebSocketServer({ server });
 
 wss.on('connection', (socket: CustomWebSocket, request) => {
   const cookies = request.headers.cookie;
-
+  // read the cookie from the request
   if (cookies) {
     const tokenStr = cookies.split('=')[1];
     if (tokenStr) {
@@ -148,6 +148,21 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     }
   }
 
+  socket.on('message', (msg) => {
+    const message = JSON.parse(msg.toString());
+    if(message.recipient && message.text){
+      [...wss.clients]
+        .filter((c: CustomWebSocket) => c.userId === message.recipient)
+        .forEach((c: CustomWebSocket) => {
+          c.send(JSON.stringify({
+            sender: socket.userId,
+            text: message.text
+          }))
+        });
+    }
+  });
+
+  // notify all clients about the new connection (when someone connects)
   [...wss.clients].forEach((c: CustomWebSocket) => {
     c.send(JSON.stringify({
       online: [...wss.clients].map((c: CustomWebSocket) => ({

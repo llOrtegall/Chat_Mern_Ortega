@@ -15,8 +15,9 @@ export default function ChatPage() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlinePeople[]>([])
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
+  const [messages, setMessages] = useState<string[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
-  const { username, id } = useUserContext()
+  const { id } = useUserContext()
 
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:3050')
@@ -30,6 +31,8 @@ export default function ChatPage() {
     const msgData = JSON.parse(event.data) as DataMessage
     if (msgData.online) {
       showOnlinePeople(msgData.online)
+    } else {
+      console.log(msgData);
     }
   }
 
@@ -42,11 +45,12 @@ export default function ChatPage() {
     ev.preventDefault()
 
     ws?.send(JSON.stringify({
-      message: {
-        recipient: selectedPerson,
-        text: newMsgText,
-      }
+      recipient: selectedPerson,
+      text: newMsgText,
     }))
+
+    setNewMsgText('')
+    setMessages(prev => [...prev, newMsgText])
   }
 
   return (
@@ -90,7 +94,7 @@ export default function ChatPage() {
           !!selectedPerson && (
             <form className='flex gap-2 m-2' onSubmit={sendMessage}>
               <input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
-                type='text' placeholder='type your message here' 
+                type='text' placeholder='type your message here'
                 className='bg-white rounded-sm flex-grow px-1' />
               <button className='bg-green-500 p-2 text-white rounded-sm' type='submit'>
                 <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='size-6'>
