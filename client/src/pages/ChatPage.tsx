@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useUserContext } from '../context/UserContext';
 import Avatar from '../components/Avatar';
+import axios from 'axios';
 
 interface OnlinePeople {
   userId: string
@@ -8,7 +9,7 @@ interface OnlinePeople {
 }
 
 interface Messages {
-  id: string
+  _id: string
   recipient: string
   sender: string
   text: string
@@ -30,21 +31,30 @@ export default function ChatPage() {
   const { id } = useUserContext()
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3050')
+    connectToWs()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
+  const connectToWs = () => {
+    const ws = new WebSocket('ws://localhost:3050')
     setWs(ws)
 
     ws.addEventListener('message', handleMessage)
-  }, [])
+    ws.addEventListener('close', () => {
+      setTimeout(() => {
+        connectToWs()
+      }, 3000)
+    })
+  }
 
   const handleMessage = (event: MessageEvent) => {
     const msgData = JSON.parse(event.data) as DataMessage
     if (msgData.online) {
       showOnlinePeople(msgData.online)
     } else if (msgData.mgsSend) {
-      const { sender, recipient, text, id } = msgData.mgsSend
+      const { sender, recipient, text, _id } = msgData.mgsSend
       setMessages(prev => [...prev, {
-        id,
+        _id,
         recipient,
         sender,
         text,
@@ -67,7 +77,7 @@ export default function ChatPage() {
 
     setNewMsgText('')
     setMessages(prev => [...prev, {
-      id: new Date().toISOString(),
+      _id: new Date().toISOString(),
       recipient: selectedPerson!,
       sender: id,
       text: newMsgText,
@@ -79,6 +89,16 @@ export default function ChatPage() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
+
+  useEffect(() => {
+    if(selectedPerson){
+      axios.get('/messages/' + selectedPerson)
+        .then(res => {
+          setMessages(res.data)
+        })
+        .catch(err => console.log(err))
+    }
+  }, [selectedPerson])
 
   return (
     <section className='h-screen flex'>
@@ -98,7 +118,7 @@ export default function ChatPage() {
                 <div className={`w-1.5 rounded-r-md bg-blue-600 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
                 <button onClick={() => setSelectedPerson(person.userId)}
                   className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
-                  <Avatar userId={person.userId} username={person.username} />
+                  <Avatar online={true} userId={person.userId} username={person.username} />
                   <p>{person.username}</p>
                 </button>
               </section>
@@ -122,7 +142,7 @@ export default function ChatPage() {
                 <div className='flex flex-col gap-2 p-2 pb-2'>
                   {
                     messages.map((msg) => (
-                      <div key={msg.id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
+                      <div key={msg._id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
                         <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
                           {msg.text}
                         </div>

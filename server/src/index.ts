@@ -45,7 +45,7 @@ app.get('/messages/:userId', async (req, res) => {
     const messages = await MessageModel.find({
       sender: { $in: [userId, userData.userId] },
       recipient : { $in: [userId, userData.userId] }
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: 1 });
 
     res.status(200).json(messages);
   } catch (error) {
@@ -193,7 +193,7 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
               sender: socket.userId,
               recipient: message.recipient,
               text: message.text,
-              id: msgDoc._id
+              _id: msgDoc._id
             }
           }))
         });
