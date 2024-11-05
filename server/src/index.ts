@@ -149,6 +149,10 @@ app.post('/register', async (req, res) => {
   }
 });
 
+app.post('/logout', (req, res) => {
+  res.clearCookie('token').json('Logged out');
+});
+
 const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
