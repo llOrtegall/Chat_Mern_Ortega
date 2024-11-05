@@ -156,6 +156,9 @@ const server = app.listen(PORT, () => {
 interface CustomWebSocket extends WebSocket {
   userId?: string;
   username?: string;
+  isAlive?: boolean;
+  timer?: NodeJS.Timeout;
+  deathTimer?: NodeJS.Timeout;
 }
 
 interface TokenPayload extends JwtPayload {
@@ -166,6 +169,35 @@ interface TokenPayload extends JwtPayload {
 const wss = new ws.WebSocketServer({ server });
 
 wss.on('connection', (socket: CustomWebSocket, request) => {
+
+  const notifyOnlinePeople = () => {
+      // notify all clients about the new connection (when someone connects)
+  [...wss.clients].forEach((c: CustomWebSocket) => {
+    c.send(JSON.stringify({
+      online: [...wss.clients].map((c: CustomWebSocket) => ({
+        userId: c.userId, username: c.username
+      }))
+    }))
+  });
+  }
+
+  socket.isAlive = true;
+
+  socket.timer = setInterval(() => {
+    socket.ping();
+
+    socket.deathTimer = setTimeout(() => {
+      socket.isAlive = false;
+      socket.terminate();
+      console.log('Client is dead');
+    }, 5000);
+  }, 10000);
+
+  socket.on('pong', () => {
+    // console.log('Pong received');
+    clearTimeout(socket.deathTimer);
+  });
+
   const cookies = request.headers.cookie;
   // read the cookie from the request
   if (cookies) {
@@ -209,13 +241,5 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     }
   });
 
-  // notify all clients about the new connection (when someone connects)
-  [...wss.clients].forEach((c: CustomWebSocket) => {
-    c.send(JSON.stringify({
-      online: [...wss.clients].map((c: CustomWebSocket) => ({
-        userId: c.userId, username: c.username
-      }))
-    }))
-  });
-})
 
+})
