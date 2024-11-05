@@ -25,7 +25,7 @@ app.use(cors({ origin: CORS_ORIGIN, credentials: true, }));
 async function getUserByToken(req: Request) {
   const token = req.headers.cookie?.split('=')[1];
   if (!token) return null;
-  return jwt.verify(token, JWT_SECRET, {}) as TokenPayload; 
+  return jwt.verify(token, JWT_SECRET, {}) as TokenPayload;
 }
 
 app.get('/test', (req, res) => {
@@ -44,7 +44,7 @@ app.get('/messages/:userId', async (req, res) => {
   try {
     const messages = await MessageModel.find({
       sender: { $in: [userId, userData.userId] },
-      recipient : { $in: [userId, userData.userId] }
+      recipient: { $in: [userId, userData.userId] }
     }).sort({ createdAt: 1 });
 
     res.status(200).json(messages);
@@ -74,7 +74,7 @@ app.get('/profile', async (req, res) => {
 
 app.get('/people', async (req, res) => {
   try {
-    const users = await UserModel.find({}, {'_id': 1, 'username': 1});
+    const users = await UserModel.find({}, { '_id': 1, 'username': 1 });
     res.status(200).json(users);
   } catch (error) {
     console.log(error);
@@ -171,14 +171,14 @@ const wss = new ws.WebSocketServer({ server });
 wss.on('connection', (socket: CustomWebSocket, request) => {
 
   const notifyOnlinePeople = () => {
-      // notify all clients about the new connection (when someone connects)
-  [...wss.clients].forEach((c: CustomWebSocket) => {
-    c.send(JSON.stringify({
-      online: [...wss.clients].map((c: CustomWebSocket) => ({
-        userId: c.userId, username: c.username
+    // notify all clients about the new connection (when someone connects)
+    [...wss.clients].forEach((c: CustomWebSocket) => {
+      c.send(JSON.stringify({
+        online: [...wss.clients].map((c: CustomWebSocket) => ({
+          userId: c.userId, username: c.username
+        }))
       }))
-    }))
-  });
+    });
   }
 
   socket.isAlive = true;
@@ -189,7 +189,9 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     socket.deathTimer = setTimeout(() => {
       socket.isAlive = false;
       socket.terminate();
-      console.log('Client is dead');
+      notifyOnlinePeople();
+      // 
+      // console.log('Client is dead');
     }, 5000);
   }, 10000);
 
@@ -241,5 +243,6 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
     }
   });
 
+  notifyOnlinePeople();
 
 })
