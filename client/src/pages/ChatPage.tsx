@@ -128,7 +128,7 @@ export default function ChatPage() {
 
   return (
     <section className='h-screen flex'>
-      <section className='flex flex-col h-full bg-blue-200 w-1/3 '>
+      <section className='flex flex-col h-full bg-blue-200 w-1/3 justify-around'>
 
         <div className='text-2xl text-blue-700 font-bold flex gap-2 items-center justify-center py-2'>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -138,7 +138,7 @@ export default function ChatPage() {
           <p>MernChat</p>
         </div>
 
-        <div className='flex flex-col items-center justify-center'>
+        <div className='flex flex-col items-center justify-center overflow-y-auto'>
           {
             onlinePeople.map((person) => (
               <section key={person.userId} className={`flex w-full hover:bg-yellow-50 ${person.userId === selectedPerson ? 'bg-blue-300' : ''}`}>
@@ -165,13 +165,14 @@ export default function ChatPage() {
           }
         </div>
 
-        <div className='flex'>
+        <div className=''>
           <button onClick={logOut} className='bg-red-500 text-white w-full py-2'>
             Logout
           </button>
         </div>
 
       </section>
+
       <main className='bg-blue-300 flex flex-col w-2/3'>
         <div className='flex-grow overflow-y-auto'>
           {
