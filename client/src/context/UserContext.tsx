@@ -3,18 +3,18 @@ import axios from 'axios';
 
 // Define la interfaz para el contexto
 interface UserContextType {
-  username: string;
-  setUsername: (username: string) => void;
-  id: string;
-  setId: (id: string) => void;
+  username: string | null;
+  setUsername: (value: string | null) => void;
+  id: string | null;
+  setId: (value: string | null) => void;
 }
 
 // Crea el contexto con un valor por defecto
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserContextProvider({ children }: { children: ReactNode }) {
-  const [username, setUsername] = useState('');
-  const [id, setId] = useState('');
+  const [username, setUsername] = useState<string | null>(null);
+  const [id, setId] = useState<string | null>(null);
 
   useEffect(() => {
     const token = document.cookie.split('=')[1];
