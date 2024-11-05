@@ -192,6 +192,7 @@ wss.on('connection', (socket: CustomWebSocket, request) => {
 
     socket.deathTimer = setTimeout(() => {
       socket.isAlive = false;
+      clearInterval(socket.timer);
       socket.terminate();
       notifyOnlinePeople();
       // 

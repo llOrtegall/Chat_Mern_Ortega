@@ -34,7 +34,7 @@ export default function ChatPage() {
   const [newMsgText, setNewMsgText] = useState<string>('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { id, setId, setUsername } = useUserContext()
+  const { id, username, setId, setUsername } = useUserContext()
 
   useEffect(() => {
     connectToWs()
@@ -69,7 +69,7 @@ export default function ChatPage() {
   }
 
   const showOnlinePeople = (people: OnlinePeople[]) => {
-    const onlinePeople = people.filter((person) => person.userId !== id)
+    const onlinePeople = people.filter((person) => person.userId !== id!)
     setOnlinePeople(onlinePeople)
   }
 
@@ -93,6 +93,7 @@ export default function ChatPage() {
   function logOut() {
     axios.post('/logout')
       .then(() => {
+        setWs(null)
         setId(null)
         setUsername(null)
       })
@@ -166,6 +167,7 @@ export default function ChatPage() {
         </div>
 
         <div className=''>
+          <p className='text-blue-700 font-bold text-center'>Welcome {username}</p>
           <button onClick={logOut} className='bg-red-500 text-white w-full py-2'>
             Logout
           </button>
