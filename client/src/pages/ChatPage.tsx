@@ -28,6 +28,7 @@ interface DataMessage extends MessageEvent {
 export default function ChatPage() {
   const [ws, setWs] = useState<WebSocket | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlinePeople[]>([])
+  const [offlinePeople, setOfflinePeople] = useState<PeopleDB[]>([])
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [messages, setMessages] = useState<Messages[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
@@ -102,7 +103,7 @@ export default function ChatPage() {
           .filter(p => p._id !== id)
           .filter(p => !onlinePeople.find(op => op.userId === p._id))
 
-        console.log(offlinePeople);
+        setOfflinePeople(offlinePeople)
       })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
@@ -136,6 +137,18 @@ export default function ChatPage() {
                 <button onClick={() => setSelectedPerson(person.userId)}
                   className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
                   <Avatar online={true} userId={person.userId} username={person.username} />
+                  <p>{person.username}</p>
+                </button>
+              </section>
+            ))
+          }
+          {
+            offlinePeople.map((person) => (
+              <section key={person._id} className={`flex w-full hover:bg-yellow-50 ${person._id === selectedPerson ? 'bg-blue-300' : ''}`}>
+                <div className={`w-1.5 rounded-r-md bg-blue-600 ${person._id === selectedPerson ? 'visible' : 'hidden'}`}></div>
+                <button onClick={() => setSelectedPerson(person._id)}
+                  className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
+                  <Avatar online={false} userId={person._id} username={person.username} />
                   <p>{person.username}</p>
                 </button>
               </section>
