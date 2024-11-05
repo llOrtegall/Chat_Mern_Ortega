@@ -85,7 +85,7 @@ export default function ChatPage() {
     setMessages(prev => [...prev, {
       _id: new Date().toISOString(),
       recipient: selectedPerson!,
-      sender: id,
+      sender: id!,
       text: newMsgText,
     }]);
   }
@@ -93,7 +93,8 @@ export default function ChatPage() {
   function logOut() {
     axios.post('/logout')
       .then(() => {
-        window.location.href = '/'
+        setId(null)
+        setUsername(null)
       })
   }
 
