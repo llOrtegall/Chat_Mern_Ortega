@@ -21,4 +21,4 @@ export const {
   MONGO_URL,
   SALT,
   PORT
-} = process.env;
+} = data;
