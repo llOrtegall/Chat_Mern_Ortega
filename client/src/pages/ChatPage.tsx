@@ -3,6 +3,8 @@ import { useUserContext } from '../context/UserContext';
 import Avatar from '../components/Avatar';
 import axios from 'axios';
 
+const WS_URL = import.meta.env.VITE_URL_API_WS! || 'http://localhost:5000'
+
 interface PeopleDB {
   _id: string
   username: string
@@ -42,7 +44,7 @@ export default function ChatPage() {
   }, [])
 
   const connectToWs = () => {
-    const ws = new WebSocket('ws://localhost:3050')
+    const ws = new WebSocket(WS_URL)
     setWs(ws)
 
     ws.addEventListener('message', handleMessage)
@@ -209,7 +211,7 @@ export default function ChatPage() {
               <input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
                 type='text' placeholder='type your message here'
                 className='bg-white rounded-sm flex-grow px-1' />
-              <button 
+              <button
                 className='bg-orange-500 hover:bg-orange-700 p-2 text-white rounded-sm' type='button' >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
