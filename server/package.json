@@ -15,9 +15,9 @@
     "bcryptjs": "2.4.3",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "jsonwebtoken": "9.0.2",
-    "mongoose": "8.7.3",
+    "mongoose": "8.8.4",
     "ws": "8.18.0",
     "zod": "3.23.8"
   },
