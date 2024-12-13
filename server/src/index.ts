@@ -1,10 +1,10 @@
-import { PORT, SALT, MONGO_URL, JWT_SECRET, CORS_ORIGIN } from './config/enviroments';
+import { PORT, SALT, MONGO_URL, JWT_SECRET, CORS_ORIGIN } from '@/config/enviroments';
 import { hashSync, genSaltSync, compareSync } from 'bcryptjs';
-import { validateUser } from './Schemas/User.schemas';
-import { MessageModel } from './models/Messages';
+import { validateUser } from '@/Schemas/User.schemas';
+import { MessageModel } from '@/models/Messages';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import express, { Request } from 'express';
-import { UserModel } from './models/User';
+import { UserModel } from '@/models/User';
 import ws, { WebSocket } from 'ws';
 import mongoose from 'mongoose';
 import cors from 'cors';
