@@ -1,13 +1,13 @@
 import { PORT, MONGO_URL, JWT_SECRET, CORS_ORIGIN } from '@/config/enviroments';
-import { CustomWebSocket, TokenPayload } from './types/interfaces';
-import { userRouter } from './routes/user.routes';
+import { CustomWebSocket, TokenPayload } from '@/types/interfaces';
+import { userRouter } from '@/routes/user.routes';
+import { chatRouter } from '@/routes/chat.routes';
 import { MessageModel } from '@/models/Messages';
-import jwt from 'jsonwebtoken';
-import express, { Request } from 'express';
-import { UserModel } from '@/models/User';
-import ws from 'ws';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import express from 'express';
 import cors from 'cors';
+import ws from 'ws';
 
 mongoose.connect(MONGO_URL);
 
@@ -16,48 +16,11 @@ app.use(express.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true, }));
 
 app.use('/', userRouter);
-
-async function getUserByToken(req: Request) {
-  const token = req.headers.cookie?.split('=')[1];
-  if (!token) return null;
-  return jwt.verify(token, JWT_SECRET, {}) as TokenPayload;
-}
-
-app.get('/messages/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const userData = await getUserByToken(req);
-
-  if (!userData) {
-    res.status(401).json('Unauthorized');
-    return;
-  }
-
-  try {
-    const messages = await MessageModel.find({
-      sender: { $in: [userId, userData.userId] },
-      recipient: { $in: [userId, userData.userId] }
-    }).sort({ createdAt: 1 });
-
-    res.status(200).json(messages);
-  } catch (error) {
-    res.status(500).json('An error occurred');
-  }
-});
-
-app.get('/people', async (req, res) => {
-  try {
-    const users = await UserModel.find({}, { '_id': 1, 'username': 1 });
-    res.status(200).json(users);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json('An error occurred');
-  }
-});
+app.use('/', chatRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
 
 const wss = new ws.WebSocketServer({ server });
 

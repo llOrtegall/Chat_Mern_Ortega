@@ -1,6 +1,6 @@
+import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { SALT, JWT_SECRET } from '@/config/enviroments';
 import { validateUser } from '@/Schemas/User.schemas';
-import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { Request, Response } from 'express';
 import { UserModel } from '@/models/User';
 import jwt from 'jsonwebtoken';
