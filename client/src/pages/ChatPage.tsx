@@ -1,6 +1,11 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { useUserContext } from '../context/UserContext';
-import Avatar from '../components/Avatar';
+import { RiEmotionHappyLine, RiSendPlane2Line, RiAttachment2 } from '@remixicon/react';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
+import { useUserContext } from '@/context/UserContext';
+import { InputSearch } from '@/components/Searh';
+import { Button } from '@/components/Button';
+import Avatar from '@/components/Avatar';
+import { Input } from '@/components/Input';
 import axios from 'axios';
 
 const WS_URL = import.meta.env.VITE_URL_API_WS! || 'http://localhost:5000'
@@ -28,15 +33,17 @@ interface DataMessage extends MessageEvent {
 }
 
 export default function ChatPage() {
-  const [ws, setWs] = useState<WebSocket | null>(null)
+  const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlinePeople[]>([])
   const [offlinePeople, setOfflinePeople] = useState<PeopleDB[]>([])
-  const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [messages, setMessages] = useState<Messages[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
+  const [ws, setWs] = useState<WebSocket | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { id, username, setId, setUsername } = useUserContext()
+  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
+
+  const { id, setId, setUsername } = useUserContext()
 
   useEffect(() => {
     connectToWs()
@@ -101,6 +108,10 @@ export default function ChatPage() {
       })
   }
 
+  function handleClickEmoji(emoji: { emoji: string }) {
+    setNewMsgText(prev => prev + emoji.emoji)
+  }
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -131,58 +142,62 @@ export default function ChatPage() {
 
   return (
     <section className='h-screen flex'>
-      <section className='flex flex-col h-full bg-blue-200 w-1/3 justify-around'>
 
-        <div className='text-2xl text-blue-700 font-bold flex gap-2 items-center justify-center py-2'>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-          </svg>
+      <section className='flex flex-col w-4/12 h-full dark:bg-gray-900 justify-between'>
 
-          <p>MernChat</p>
-        </div>
+        <header className='text-2xl text-gray-400 flex flex-col items-center justify-around border-b border-gray-500 py-2'>
+          <p className='text-center font-semibold flex items-center gap-2'>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+            <span>MernChat</span>
+          </p>
+        </header>
 
-        <div className='flex flex-col items-center justify-center overflow-y-auto'>
-          {
-            onlinePeople.map((person) => (
-              <section key={person.userId} className={`flex w-full hover:bg-yellow-50 ${person.userId === selectedPerson ? 'bg-blue-300' : ''}`}>
-                <div className={`w-1.5 rounded-r-md bg-blue-600 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
-                <button onClick={() => setSelectedPerson(person.userId)}
-                  className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
-                  <Avatar online={true} userId={person.userId} username={person.username} />
-                  <p>{person.username}</p>
-                </button>
-              </section>
-            ))
-          }
-          {
-            offlinePeople.map((person) => (
-              <section key={person._id} className={`flex w-full hover:bg-yellow-50 ${person._id === selectedPerson ? 'bg-blue-300' : ''}`}>
-                <div className={`w-1.5 rounded-r-md bg-blue-600 ${person._id === selectedPerson ? 'visible' : 'hidden'}`}></div>
-                <button onClick={() => setSelectedPerson(person._id)}
-                  className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
-                  <Avatar online={false} userId={person._id} username={person.username} />
-                  <p>{person.username}</p>
-                </button>
-              </section>
-            ))
-          }
-        </div>
+        <article className='flex flex-col flex-grow gap-2'>
+          <InputSearch />
+          <div className='overflow-y-auto'>
+            {
+              onlinePeople.map((person) => (
+                <section key={person.userId} className={`flex w-full hover:bg-gray-800 text-gray-200 ${person.userId === selectedPerson ? 'bg-gray-600' : ''}`}>
+                  <div className={`w-1.5 rounded-r-md bg-gray-400 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
+                  <button onClick={() => setSelectedPerson(person.userId)}
+                    className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
+                    <Avatar online={true} userId={person.userId} username={person.username} />
+                    <p>{person.username}</p>
+                  </button>
+                </section>
+              ))
+            }
+            {
+              offlinePeople.map((person) => (
+                <section key={person._id} className={`flex w-full hover:bg-gray-800 text-gray-200 ${person._id === selectedPerson ? 'bg-gray-600' : ''}`}>
+                  <div className={`w-1.5 rounded-r-md bg-gray-400 ${person._id === selectedPerson ? 'visible' : 'hidden'}`}></div>
+                  <button onClick={() => setSelectedPerson(person._id)}
+                    className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
+                    <Avatar online={false} userId={person._id} username={person.username} />
+                    <p>{person.username}</p>
+                  </button>
+                </section>
+              ))
+            }
+          </div>
+        </article>
 
-        <div className=''>
-          <p className='text-blue-700 font-bold text-center'>Welcome {username}</p>
-          <button onClick={logOut} className='bg-red-500 text-white w-full py-2'>
-            Logout
-          </button>
-        </div>
+        <footer className='border-t border-gray-500 py-2 flex justify-center'>
+          <Button onClick={logOut} variant='secondary'>
+            Log Out
+          </Button>
+        </footer>
 
-      </section>
+      </section >
 
-      <main className='bg-blue-300 flex flex-col w-2/3'>
+      <main className='dark:bg-gray-950 flex flex-col w-8/12'>
         <div className='flex-grow overflow-y-auto'>
           {
             !selectedPerson && (
               <div className='flex items-center justify-center h-full'>
-                <p className='text-2xl text-blue-700 font-bold'>Select a person to chat with</p>
+                <p className='text-2xl text-gray-400 font-bold'>Select a person to chat with</p>
               </div>
             )
           }
@@ -207,26 +222,32 @@ export default function ChatPage() {
         </div>
         {
           !!selectedPerson && (
-            <form className='flex gap-2 m-2' onSubmit={sendMessage}>
-              <input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
-                type='text' placeholder='type your message here'
-                className='bg-white rounded-sm flex-grow px-1' />
-              <button
-                className='bg-orange-500 hover:bg-orange-700 p-2 text-white rounded-sm' type='button' >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-                </svg>
-
+            <form className='flex gap-2 m-2 relative' onSubmit={sendMessage}>
+              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'
+                type='button'>
+                <RiEmotionHappyLine />
               </button>
-              <button className='bg-green-500 p-2 hover:bg-green-700 text-white rounded-sm' type='submit'>
-                <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' strokeWidth={1.5} stroke='currentColor' className='size-6'>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5' />
-                </svg>
+              <button className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'>
+                <RiAttachment2 />
+              </button>
+              <div className='absolute bottom-12'>
+                <EmojiPicker
+                  theme={Theme.DARK}
+                  open={showEmojiPicker}
+                  onEmojiClick={handleClickEmoji}
+                />
+              </div>
+              <Input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
+                type='text' placeholder='type your message here' />
+              <button className='bg-blue-900 p-2 hover:bg-blue-800 text-white rounded-sm' type='submit'>
+                <RiSendPlane2Line />
               </button>
             </form>
           )
         }
       </main>
-    </section>
+
+    </section >
   )
 }

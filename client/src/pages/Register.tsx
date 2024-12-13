@@ -1,4 +1,4 @@
-import { useUserContext } from '../context/UserContext'
+import { useUserContext } from '@/context/UserContext'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Label } from '@/components/Label'
