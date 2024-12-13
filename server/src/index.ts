@@ -8,12 +8,6 @@ import mongoose from 'mongoose';
 import express, { Request } from 'express';
 import cors from 'cors';
 
-const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
-const JWT_SECRET = process.env.JWT_SECRET ?? 'secret';
-const MONGO_URL = process.env.MONGO_URL ?? ''
-const SALT = process.env.SALT_ROUNDS as string;
-const PORT = process.env.PORT ?? 3000;
-
 const bcryptSalt = genSaltSync(parseInt(SALT));
 
 mongoose.connect(MONGO_URL);
