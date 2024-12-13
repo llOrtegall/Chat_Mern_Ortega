@@ -45,14 +45,14 @@ export const loginUser = async (req: Request, res: Response) => {
     const foundUser = await UserModel.findOne({ username });
 
     if (!foundUser) {
-      res.status(404).json('User not found');
+      res.status(404).json('User not found in the database');
       return;
     }
 
     const isPasswordValid = compareSync(password, foundUser.password);
 
     if (!isPasswordValid) {
-      res.status(401).json('Invalid password');
+      res.status(401).json('Invalid password try again');
       return;
     }
 

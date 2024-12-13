@@ -1,6 +1,10 @@
+import { useUserContext } from '../context/UserContext'
+import { Button } from '@/components/Button'
+import { Input } from '@/components/Input'
+import { Label } from '@/components/Label'
+import { toast, Toaster } from 'sonner'
 import { useState } from 'react'
 import axios from 'axios'
-import { useUserContext } from '../context/UserContext'
 
 export default function Register() {
   const [username, setUsername] = useState('')
@@ -16,8 +20,16 @@ export default function Register() {
       const res = await axios.post('/login', { username, password })
       setLoggedInUsername(res.data.username)
       setId(res.data.id)
-    } catch (error) {
-      console.error(error)
+    } catch (error: unknown) {
+      if (error instanceof axios.AxiosError) {
+        if (error.response?.status === 404) {
+          toast.error('Error on try login', { description: error.response.data })
+        } else if (error.response?.status === 401) {
+          toast.error('Error on try login', { description: error.response.data })
+        } else {
+          toast.error('Error on try login', { description: 'Error on server' })
+        }
+      }
     }
   }
 
@@ -38,47 +50,53 @@ export default function Register() {
   }
 
   return (
-    <div className="relative h-screen w-full bg-slate-950">
-      <div className="absolute z-0 bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]">
+    <>
+      <div className="relative h-screen w-full bg-slate-950">
+        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]">
+          <main className='flex flex-col items-center justify-center h-full  z-20'>
 
-        <main className='flex flex-col items-center justify-center h-full'>
-          <h1 className='text-2xl font-bold mb-4'>
-            {
-              isLoggingIn === 'login' ? 'Login' : 'Register'
-            }
-          </h1>
-          <form className='flex flex-col space-y-1 w-1/3' onSubmit={handleSubmit}>
-            <input value={username} onChange={e => setUsername(e.target.value)}
-              type='text' placeholder='Username' className='p-2 border border-gray-300 rounded' />
-            {
-              isLoggingIn === 'register' && (
-                <input value={email} onChange={e => setEmail(e.target.value)}
-                  type='email' placeholder='Email' className='p-2 border border-gray-300 rounded' />
-              )
-            }
-            <input value={password} onChange={e => setPassword(e.target.value)}
-              type='password' placeholder='Password' className='p-2 border border-gray-300 rounded' />
-            <button className='bg-blue-600 text-white p-2 rounded' type='submit'>
+            <form className='flex flex-col gap-2 w-1/5' onSubmit={handleSubmit}>
+              <Label className='font-semibold' htmlFor='username'>Username</Label>
+              <Input value={username} onChange={e => setUsername(e.target.value)}
+                type='text' placeholder='JhonDoe07' required />
               {
-                isLoggingIn === 'login' ? 'Login' : 'Register'
+                isLoggingIn === 'register' && (
+                  <>
+                    <Label className='font-semibold' htmlFor='email'>Email</Label>
+                    <Input value={email} onChange={e => setEmail(e.target.value)}
+                      type='email' placeholder='useremail@example.com' />
+                  </>
+                )
               }
+              <Label className='font-semibold' htmlFor='password'>Password</Label>
+              <Input value={password} onChange={e => setPassword(e.target.value)}
+                type='password' placeholder='*********' required />
+              <Button type='submit' variant='secondary'>
+                {
+                  isLoggingIn === 'login' ? 'Login' : 'Register'
+                }
+              </Button>
+            </form>
+
+            <button onClick={() => setIsLoggingIn(isLoggingIn === 'login' ? 'register' : 'login')}
+              className='mt-4 dark:text-white font-semibold dark:hover:text-yellow-200'>
+              <span className='px-2'>
+                {
+                  isLoggingIn === 'login' ? 'Don\'t have an account ? -' : 'Already have an account ? -'
+                }
+              </span>
+              <span>
+                {
+                  isLoggingIn === 'login' ? 'Register' : 'Login'
+                }
+              </span>
             </button>
-          </form>
+          </main>
 
-          <button onClick={() => setIsLoggingIn(isLoggingIn === 'login' ? 'register' : 'login')}
-            className='mt-4'>
-            <span className='px-2'>
-              {
-                isLoggingIn === 'login' ? 'Don\'t have an account?' : 'Already have an account?'
-              }
-            </span>
-            {
-              isLoggingIn === 'login' ? 'Register' : 'Login'
-            }
-          </button>
-        </main>
-
+        </div>
       </div>
-    </div>
+
+      <Toaster richColors duration={4000} position='top-right' visibleToasts={3} />
+    </>
   )
 }
