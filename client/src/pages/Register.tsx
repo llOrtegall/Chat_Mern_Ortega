@@ -38,43 +38,47 @@ export default function Register() {
   }
 
   return (
-    <section className='h-screen w-full bg-gray-200'>
-      <div className='flex flex-col items-center justify-center h-full'>
-        <h1 className='text-2xl font-bold mb-4'>
-          {
-            isLoggingIn === 'login' ? 'Login' : 'Register'
-          }
-        </h1>
-        <form className='flex flex-col space-y-1 w-1/3' onSubmit={handleSubmit}>
-          <input value={username} onChange={e => setUsername(e.target.value)}
-            type='text' placeholder='Username' className='p-2 border border-gray-300 rounded' />
-          {
-            isLoggingIn === 'register' && (
-              <input value={email} onChange={e => setEmail(e.target.value)}
-                type='email' placeholder='Email' className='p-2 border border-gray-300 rounded' />
-            )
-          }
-          <input value={password} onChange={e => setPassword(e.target.value)}
-            type='password' placeholder='Password' className='p-2 border border-gray-300 rounded' />
-          <button className='bg-blue-600 text-white p-2 rounded' type='submit'>
+    <div className="relative h-screen w-full bg-slate-950">
+      <div className="absolute z-0 bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_50%_200px,#3e3e3e,transparent)]">
+
+        <main className='flex flex-col items-center justify-center h-full'>
+          <h1 className='text-2xl font-bold mb-4'>
             {
               isLoggingIn === 'login' ? 'Login' : 'Register'
             }
-          </button>
-        </form>
+          </h1>
+          <form className='flex flex-col space-y-1 w-1/3' onSubmit={handleSubmit}>
+            <input value={username} onChange={e => setUsername(e.target.value)}
+              type='text' placeholder='Username' className='p-2 border border-gray-300 rounded' />
+            {
+              isLoggingIn === 'register' && (
+                <input value={email} onChange={e => setEmail(e.target.value)}
+                  type='email' placeholder='Email' className='p-2 border border-gray-300 rounded' />
+              )
+            }
+            <input value={password} onChange={e => setPassword(e.target.value)}
+              type='password' placeholder='Password' className='p-2 border border-gray-300 rounded' />
+            <button className='bg-blue-600 text-white p-2 rounded' type='submit'>
+              {
+                isLoggingIn === 'login' ? 'Login' : 'Register'
+              }
+            </button>
+          </form>
 
-        <button onClick={() => setIsLoggingIn(isLoggingIn === 'login' ? 'register' : 'login')}
-          className='mt-4'>
+          <button onClick={() => setIsLoggingIn(isLoggingIn === 'login' ? 'register' : 'login')}
+            className='mt-4'>
             <span className='px-2'>
               {
                 isLoggingIn === 'login' ? 'Don\'t have an account?' : 'Already have an account?'
               }
             </span>
-          {
-            isLoggingIn === 'login' ? 'Register' : 'Login'
-          }
-        </button>
+            {
+              isLoggingIn === 'login' ? 'Register' : 'Login'
+            }
+          </button>
+        </main>
+
       </div>
-    </section>
+    </div>
   )
 }
