@@ -8,14 +8,15 @@ import { UserModel } from '@/models/User';
 import ws, { WebSocket } from 'ws';
 import mongoose from 'mongoose';
 import cors from 'cors';
-
-const bcryptSalt = genSaltSync(parseInt(SALT));
+import { userRouter } from './routes/user.routes';
 
 mongoose.connect(MONGO_URL);
 
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true, }));
+
+app.use('/', userRouter);
 
 async function getUserByToken(req: Request) {
   const token = req.headers.cookie?.split('=')[1];
@@ -110,33 +111,6 @@ app.post('/login', async (req, res) => {
     });
 
 
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json('An error occurred');
-  }
-});
-
-app.post('/register', async (req, res) => {
-  const data = validateUser(req.body);
-
-  const hasPassword = hashSync(data.password, bcryptSalt);
-
-  try {
-    const createdUser = await UserModel.create({
-      username: data.username,
-      email: data.email,
-      password: hasPassword
-    });
-
-    jwt.sign({ userId: createdUser._id, username: createdUser.username }, JWT_SECRET, { expiresIn: '2h' }, (err, token) => {
-      if (err) throw err;
-      res.status(201).cookie('token', token, { sameSite: 'lax', secure: false }).json({
-        id: createdUser._id,
-        username: createdUser.username
-      });
-      return;
-    });
 
   } catch (error) {
     console.log(error);
