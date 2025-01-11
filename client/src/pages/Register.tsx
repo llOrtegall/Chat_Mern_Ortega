@@ -25,11 +25,23 @@ export default function Register() {
     } catch (error: unknown) {
       if (error instanceof axios.AxiosError) {
         if (error.response?.status === 404) {
-          toast({ title: 'Error on try login', description: error.response.data || 'User not found' })
+          toast({
+            variant: 'destructive',
+            title: 'Error on try login',
+            description: error.response.data || 'User not found'
+          })
         } else if (error.response?.status === 401) {
-          toast({ title: 'Error on try login', description: error.response.data || 'User not found' })
+          toast({
+            variant: 'destructive',
+            title: 'Error on try login',
+            description: error.response.data || 'User not found'
+          })
         } else {
-          toast({ title: 'Error on try login', description: 'Error on server' })
+          toast({
+            variant: 'destructive',
+            title: 'Error on try login',
+            description: 'Error on server'
+          })
         }
       }
     }
