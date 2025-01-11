@@ -1,11 +1,10 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { RiEmotionHappyLine, RiSendPlane2Line, RiAttachment2 } from '@remixicon/react';
+import { Smile, Paperclip, SendHorizonal } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { useUserContext } from '@/context/UserContext';
-import { InputSearch } from '@/components/Searh';
-import { Button } from '@/components/Button';
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button';
 import Avatar from '@/components/Avatar';
-import { Input } from '@/components/Input';
 import axios from 'axios';
 
 const WS_URL = import.meta.env.VITE_URL_API_WS! || 'http://localhost:5000'
@@ -155,7 +154,7 @@ export default function ChatPage() {
         </header>
 
         <article className='flex flex-col flex-grow gap-2'>
-          <InputSearch />
+
           <div className='overflow-y-auto'>
             {
               onlinePeople.map((person) => (
@@ -226,10 +225,10 @@ export default function ChatPage() {
               <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'
                 type='button'>
-                <RiEmotionHappyLine />
+                <Smile />
               </button>
               <button className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'>
-                <RiAttachment2 />
+                <Paperclip />
               </button>
               <div className='absolute bottom-12'>
                 <EmojiPicker
@@ -241,7 +240,7 @@ export default function ChatPage() {
               <Input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
                 type='text' placeholder='type your message here' />
               <button className='bg-blue-900 p-2 hover:bg-blue-800 text-white rounded-sm' type='submit'>
-                <RiSendPlane2Line />
+                <SendHorizonal />
               </button>
             </form>
           )
