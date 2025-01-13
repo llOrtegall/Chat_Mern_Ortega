@@ -1,9 +1,11 @@
+import { Smile, Paperclip, SendHorizonal, MessageCircleCodeIcon } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Smile, Paperclip, SendHorizonal } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
+import { Card, CardTitle } from '@/components/ui/card';
 import { useUserContext } from '@/context/UserContext';
-import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input'
 import Avatar from '@/components/Avatar';
 import axios from 'axios';
 
@@ -142,16 +144,14 @@ export default function ChatPage() {
   return (
     <section className='h-screen flex'>
 
-      <section className='flex flex-col w-4/12 h-full dark:bg-gray-900 justify-between'>
+      <Card className='flex w-3/12 flex-col'>
 
-        <header className='text-2xl text-gray-400 flex flex-col items-center justify-around border-b border-gray-500 py-2'>
-          <p className='text-center font-semibold flex items-center gap-2'>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-            </svg>
-            <span>MernChat</span>
-          </p>
+        <header className='flex items-center justify-center gap-2 py-2'>
+          <CardTitle className='py-1 text-2xl'>MernChat</CardTitle>
+          <MessageCircleCodeIcon size={24} />
         </header>
+
+        <Separator />
 
         <article className='flex flex-col flex-grow gap-2'>
 
@@ -183,15 +183,17 @@ export default function ChatPage() {
           </div>
         </article>
 
-        <footer className='border-t border-gray-500 py-2 flex justify-center'>
-          <Button onClick={logOut} variant='secondary'>
+        <Separator />
+
+        <footer className='flex justify-center py-2'>
+          <Button onClick={logOut} >
             Log Out
           </Button>
         </footer>
 
-      </section >
+      </Card >
 
-      <main className='dark:bg-gray-950 flex flex-col w-8/12'>
+      <Card className='flex w-9/12'>
         <div className='flex-grow overflow-y-auto'>
           {
             !selectedPerson && (
@@ -245,7 +247,7 @@ export default function ChatPage() {
             </form>
           )
         }
-      </main>
+      </Card>
 
     </section >
   )
