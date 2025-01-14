@@ -204,7 +204,7 @@ export default function ChatPage() {
           }
           {
             !!selectedPerson && (
-              <div className='overflow-y-auto max-h-[93vh]'>
+              <div className='overflow-y-auto h-[94vh] lg:h-[90vh] xl:h-[92vh] 2xl:h-[93vh]'>
                 <div className='flex flex-col gap-2 p-2 pb-2'>
                   {
                     messages.map((msg) => (
