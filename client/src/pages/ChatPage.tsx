@@ -193,8 +193,8 @@ export default function ChatPage() {
 
       </Card >
 
-      <Card className='flex w-9/12'>
-        <div className='flex-grow overflow-y-auto'>
+      <Card className='w-9/12'>
+        <div className=''>
           {
             !selectedPerson && (
               <div className='flex items-center justify-center h-full'>
@@ -204,7 +204,7 @@ export default function ChatPage() {
           }
           {
             !!selectedPerson && (
-              <div className='mb-4 h-full'>
+              <div className='overflow-y-auto max-h-[93vh]'>
                 <div className='flex flex-col gap-2 p-2 pb-2'>
                   {
                     messages.map((msg) => (
