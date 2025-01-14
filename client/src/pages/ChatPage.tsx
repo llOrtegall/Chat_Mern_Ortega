@@ -158,8 +158,8 @@ export default function ChatPage() {
           <div className='overflow-y-auto'>
             {
               onlinePeople.map((person) => (
-                <section key={person.userId} className={`flex w-full hover:bg-gray-800 text-gray-200 ${person.userId === selectedPerson ? 'bg-gray-600' : ''}`}>
-                  <div className={`w-1.5 rounded-r-md bg-gray-400 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
+                <section key={person.userId} className={`flex w-full hover:bg-blue-200 text-gray-600 ${person.userId === selectedPerson ? 'bg-blue-300' : ''}`}>
+                  <div className={`w-1.5 rounded-r-md bg-blue-800 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
                   <button onClick={() => setSelectedPerson(person.userId)}
                     className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
                     <Avatar online={true} userId={person.userId} username={person.username} />
@@ -170,7 +170,7 @@ export default function ChatPage() {
             }
             {
               offlinePeople.map((person) => (
-                <section key={person._id} className={`flex w-full hover:bg-gray-800 text-gray-200 ${person._id === selectedPerson ? 'bg-gray-600' : ''}`}>
+                <section key={person._id} className={`flex w-full hover:bg-blue-200 text-gray-600 ${person._id === selectedPerson ? 'bg-gray-600' : ''}`}>
                   <div className={`w-1.5 rounded-r-md bg-gray-400 ${person._id === selectedPerson ? 'visible' : 'hidden'}`}></div>
                   <button onClick={() => setSelectedPerson(person._id)}
                     className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
@@ -225,11 +225,11 @@ export default function ChatPage() {
           !!selectedPerson && (
             <form className='flex gap-2 m-2 relative' onSubmit={sendMessage}>
               <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'
+                className='text-white bg-gray-700 hover:bg-blue-200 p-2 rounded-sm'
                 type='button'>
                 <Smile />
               </button>
-              <button className='text-white bg-gray-700 hover:bg-gray-800 p-2 rounded-sm'>
+              <button className='text-white bg-gray-700 hover:bg-blue-200 p-2 rounded-sm'>
                 <Paperclip />
               </button>
               <div className='absolute bottom-12'>
