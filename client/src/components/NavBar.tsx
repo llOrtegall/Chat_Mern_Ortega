@@ -1,3 +1,4 @@
+import { useUserContext } from '@/context/UserContext';
 import { MessageCircleCodeIcon } from 'lucide-react';
 import { OnlinePeople } from '@/types/interfaces';
 import { Card, CardTitle } from './ui/card';
@@ -7,13 +8,14 @@ import axios from 'axios';
 import Avatar from './Avatar';
 
 export function NavBar({ people, selected, funSelect }: { people: OnlinePeople[], selected: string | null, funSelect: React.Dispatch<React.SetStateAction<string | null>> }) {
+  const { setUsername, setId } = useUserContext()
 
   const logOut = () => {
     axios.post('/logout')
       .then(() => {
         // setWs(null)
-        // setId(null)
-        // setUsername(null)
+        setId(null)
+        setUsername(null)
       })
   }
 
