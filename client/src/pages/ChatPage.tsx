@@ -1,23 +1,18 @@
-import { Smile, Paperclip, SendHorizonal, MessageCircleCodeIcon } from 'lucide-react';
+import { Smile, Paperclip, SendHorizonal } from 'lucide-react';
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import EmojiPicker, { Theme } from 'emoji-picker-react';
-import { Card, CardTitle } from '@/components/ui/card';
 import { useUserContext } from '@/context/UserContext';
-import { Separator } from '@/components/ui/separator';
+import { OnlinePeople } from '@/types/interfaces';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'
-import Avatar from '@/components/Avatar';
+import { NavBar } from '@/components/NavBar';
+import { Card } from '@/components/ui/card';
 import axios from 'axios';
 
 const WS_URL = import.meta.env.VITE_URL_API_WS! || 'http://localhost:5000'
 
 interface PeopleDB {
   _id: string
-  username: string
-}
-
-interface OnlinePeople {
-  userId: string
   username: string
 }
 
@@ -36,7 +31,6 @@ interface DataMessage extends MessageEvent {
 export default function ChatPage() {
   const [selectedPerson, setSelectedPerson] = useState<string | null>(null)
   const [onlinePeople, setOnlinePeople] = useState<OnlinePeople[]>([])
-  const [offlinePeople, setOfflinePeople] = useState<PeopleDB[]>([])
   const [messages, setMessages] = useState<Messages[]>([])
   const [newMsgText, setNewMsgText] = useState<string>('')
   const [ws, setWs] = useState<WebSocket | null>(null)
@@ -105,14 +99,6 @@ export default function ChatPage() {
     }]);
   }
 
-  function logOut() {
-    axios.post('/logout')
-      .then(() => {
-        setWs(null)
-        setId(null)
-        setUsername(null)
-      })
-  }
 
   function handleClickEmoji(emoji: { emoji: string }) {
     setNewMsgText(prev => prev + emoji.emoji)
@@ -124,6 +110,7 @@ export default function ChatPage() {
     }
   }, [messages])
 
+  /*
   useEffect(() => {
     axios.get<PeopleDB[]>('/people')
       .then(res => {
@@ -135,6 +122,7 @@ export default function ChatPage() {
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onlinePeople])
+  */
 
   useEffect(() => {
     if (selectedPerson) {
@@ -149,54 +137,7 @@ export default function ChatPage() {
   return (
     <section className='h-screen flex'>
 
-      <Card className='flex w-3/12 flex-col'>
-
-        <header className='flex items-center justify-center gap-2 py-2'>
-          <CardTitle className='py-1 text-2xl'>MernChat</CardTitle>
-          <MessageCircleCodeIcon size={24} />
-        </header>
-
-        <Separator />
-
-        <article className='flex flex-col flex-grow gap-2'>
-
-          <div className='overflow-y-auto'>
-            {
-              onlinePeople.map((person) => (
-                <section key={person.userId} className={`flex w-full hover:bg-blue-200 text-gray-600 ${person.userId === selectedPerson ? 'bg-blue-300' : ''}`}>
-                  <div className={`w-1.5 rounded-r-md bg-blue-800 ${person.userId === selectedPerson ? 'visible' : 'hidden'}`}></div>
-                  <button onClick={() => setSelectedPerson(person.userId)}
-                    className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
-                    <Avatar online={true} userId={person.userId} username={person.username} />
-                    <p>{person.username}</p>
-                  </button>
-                </section>
-              ))
-            }
-            {
-              offlinePeople.map((person) => (
-                <section key={person._id} className={`flex w-full hover:bg-blue-200 text-gray-600 ${person._id === selectedPerson ? 'bg-gray-600' : ''}`}>
-                  <div className={`w-1.5 rounded-r-md bg-gray-400 ${person._id === selectedPerson ? 'visible' : 'hidden'}`}></div>
-                  <button onClick={() => setSelectedPerson(person._id)}
-                    className='w-full border-gray-100 py-2 flex items-center gap-3 mx-2'>
-                    <Avatar online={false} userId={person._id} username={person.username} />
-                    <p>{person.username}</p>
-                  </button>
-                </section>
-              ))
-            }
-          </div>
-        </article>
-
-        <Separator />
-
-        <footer className='flex justify-center py-2'>
-          <Button onClick={logOut} >
-            Log Out
-          </Button>
-        </footer>
-
-      </Card >
+      <NavBar people={onlinePeople} funSelect={setSelectedPerson} selected={selectedPerson} />
 
       <Card className='w-9/12'>
         <div className=''>
