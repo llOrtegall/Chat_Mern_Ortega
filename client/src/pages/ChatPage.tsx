@@ -105,20 +105,6 @@ export default function ChatPage() {
     }
   }, [messages])
 
-  /*
-  useEffect(() => {
-    axios.get<PeopleDB[]>('/people')
-      .then(res => {
-        const offlinePeople = res.data
-          .filter(p => p._id !== id)
-          .filter(p => !onlinePeople.find(op => op.userId === p._id))
-
-        setOfflinePeople(offlinePeople)
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onlinePeople])
-  */
-
   useEffect(() => {
     if (selectedPerson) {
       axios.get('/messages/' + selectedPerson)
