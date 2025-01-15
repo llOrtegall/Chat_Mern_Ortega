@@ -86,6 +86,11 @@ export default function ChatPage() {
   function sendMessage(ev: FormEvent) {
     ev.preventDefault()
 
+    if (!selectedPerson) return
+    if (!newMsgText) return
+
+    setShowEmojiPicker(false)
+
     ws?.send(JSON.stringify({
       recipient: selectedPerson,
       text: newMsgText,
@@ -204,12 +209,12 @@ export default function ChatPage() {
           }
           {
             !!selectedPerson && (
-              <div className='overflow-y-auto h-[94vh] lg:h-[90vh] xl:h-[92vh] 2xl:h-[93vh]'>
+              <div className='overflow-y-auto h-[94vh] lg:h-[90vh] xl:h-[92vh] 2xl:h-[93vh] px-20'>
                 <div className='flex flex-col gap-2 p-2 pb-2'>
                   {
                     messages.map((msg) => (
                       <div key={msg._id} className={`flex flex-col gap-1 ${msg.sender === id ? 'items-end' : 'items-start'}`}>
-                        <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-white text-black'}`}>
+                        <div className={`p-2 rounded-md ${msg.sender === id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}>
                           {msg.text}
                         </div>
                       </div>
@@ -224,26 +229,26 @@ export default function ChatPage() {
         {
           !!selectedPerson && (
             <form className='flex gap-2 m-2 relative' onSubmit={sendMessage}>
-              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className='text-white bg-gray-700 hover:bg-blue-200 p-2 rounded-sm'
-                type='button'>
+              <Button variant={'secondary'}
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
                 <Smile />
-              </button>
-              <button className='text-white bg-gray-700 hover:bg-blue-200 p-2 rounded-sm'>
+              </Button>
+              <Button variant={'secondary'}>
                 <Paperclip />
-              </button>
+              </Button>
               <div className='absolute bottom-12'>
                 <EmojiPicker
-                  theme={Theme.DARK}
+                  theme={Theme.LIGHT}
                   open={showEmojiPicker}
                   onEmojiClick={handleClickEmoji}
                 />
               </div>
               <Input value={newMsgText} onChange={(e) => setNewMsgText(e.target.value)}
                 type='text' placeholder='type your message here' />
-              <button className='bg-blue-900 p-2 hover:bg-blue-800 text-white rounded-sm' type='submit'>
+              <Button variant={'secondary'}
+                type='submit'>
                 <SendHorizonal />
-              </button>
+              </Button>
             </form>
           )
         }
