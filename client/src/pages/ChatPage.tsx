@@ -11,11 +11,6 @@ import axios from 'axios';
 
 const WS_URL = import.meta.env.VITE_URL_API_WS! || 'http://localhost:5000'
 
-interface PeopleDB {
-  _id: string
-  username: string
-}
-
 interface Messages {
   _id: string
   recipient: string
@@ -38,7 +33,7 @@ export default function ChatPage() {
 
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false)
 
-  const { id, setId, setUsername } = useUserContext()
+  const { id } = useUserContext()
 
   useEffect(() => {
     connectToWs()
