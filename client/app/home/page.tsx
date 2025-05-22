@@ -1,13 +1,17 @@
+import { ChatComponent } from "@/components/Chat";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { auth, signOut } from "@/lib/auth";
 import { MessageCircleCode } from "lucide-react";
 import Image from "next/image";
+import { permanentRedirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
 
-  console.log(session?.user);
+  if(!session) {
+    return permanentRedirect("/login");
+  }
 
   return (
     <section className="w-full h-svh flex">
@@ -18,12 +22,7 @@ export default async function Home() {
         </header>
 
         <section className="px-4 flex-grow">
-          <h2 className="text-lg font-bold">Users Connects</h2>
-          <ul>
-            <li>user 1</li>
-            <li>user 2</li>
-            <li>user 3</li>
-          </ul>
+          <ChatComponent key={session.user?.email} names={session.user?.name!} email={session.user?.email!}/>
         </section>
 
         <footer className="px-4 py-8 space-y-4">
