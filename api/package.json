@@ -9,9 +9,13 @@
     "dev": "bun --watch run src/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/ws": "^8.18.1"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ws": "^8.18.2"
   }
 }
