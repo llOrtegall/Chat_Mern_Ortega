@@ -5,7 +5,14 @@ import { useState, useEffect } from "react";
 export const ChatComponent = ({ email, names }: { email: string, names: string }) => {
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:3010");
+    if(!email || !names) {
+      console.error("Email or names are not provided");
+      return;
+    }
+
+    const wsUrl = `ws://localhost:3010?email=${encodeURIComponent(email)}&name=${encodeURIComponent(names)}`;
+
+    const socket = new WebSocket(wsUrl);  
 
     socket.addEventListener("open", () => {
       console.log("Connected to the server");
@@ -23,7 +30,7 @@ export const ChatComponent = ({ email, names }: { email: string, names: string }
     return () => {
       socket.close();
     };
-  }, [])
+  }, [email, names]);
 
   return (
 

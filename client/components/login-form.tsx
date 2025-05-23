@@ -2,9 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { signIn } from "@/lib/auth"
 import { Separator } from "./ui/separator"
+import { signIn } from "@/lib/auth"
+import { cn } from "@/lib/utils"
 
 export function LoginForm({
   className,
