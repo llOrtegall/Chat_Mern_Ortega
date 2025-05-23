@@ -1,20 +1,11 @@
-import { auth } from "@/lib/auth";
-
+import { redirect } from "next/navigation";
 import LoginPage from "./login/page";
-import Home from "./home/page"
+import { auth } from "@/lib/auth";
 
 export default async function Page() {
   const session = await auth();
 
-  return (
-    <main>
-      {
-        session ? (
-          <Home />
-        ) : (
-          <LoginPage />
-        )
-      }
-    </main>
-  );
+  if (session?.user) return redirect('/home');
+
+  return <LoginPage />;
 }
