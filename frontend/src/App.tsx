@@ -1,25 +1,23 @@
-import { useEffect } from "react"
+import { Link, Route, Switch } from 'wouter';
 
-const WS_URL = "ws://localhost:4000"
+import LoginPage from './pages/login';
+import HomePage from './pages/home';
+import PrivateRoute from './router/privateRoute';
+import PublicRoute from './router/publicRoute';
 
 function App() {
 
-  useEffect(() => {
-    const socket = new WebSocket(WS_URL)
-
-    socket.addEventListener("open", (ev: Event) => {
-      socket.send("soy ortega")
-      console.log(ev);
-    })
-    socket.addEventListener("message", (ev: MessageEvent) => {
-      console.log(ev.data);
-    })
-  }, [])
-
   return (
-    <div>
-      test
-    </div>
+    <Switch>
+      <PrivateRoute path="/home" component={HomePage} />
+      <PublicRoute path="/login" component={LoginPage} />
+      <Route>
+        <>
+          <div>404 - Not Found</div>
+          <Link href="/login">Go to Login</Link>
+        </>
+      </Route>
+    </Switch>
   )
 }
 
